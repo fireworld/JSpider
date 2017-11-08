@@ -2,34 +2,50 @@ package cc.colorcat.spider;
 
 import cc.colorcat.spider.internal.Utils;
 
+import java.net.URI;
 import java.nio.charset.Charset;
 
 public final class WebSnapshot {
-    private String url;
+    private URI uri;
     private String resource;
     private Charset charset;
 
-    public static WebSnapshot newSuccess(String url, String resource, Charset charset) {
-        if (!Utils.isHttpUrl(url)) {
-            throw new IllegalArgumentException("illegal url, url = " + url);
+    public static WebSnapshot newSucdess(String uri, String resource, String charset) {
+        return newSuccess(URI.create(uri), resource, Charset.forName(charset));
+    }
+
+    public static WebSnapshot newSuccess(String uri, String resource, Charset charset) {
+        return newSuccess(URI.create(uri), resource, charset);
+    }
+
+    public static WebSnapshot newSuccess(URI uri, String resource, Charset charset) {
+        if (uri == null) {
+            throw new IllegalArgumentException("uri == null");
         }
         if (Utils.isEmpty(resource)) {
             throw new IllegalArgumentException("resource is empty");
         }
         if (charset == null) {
-            throw new IllegalArgumentException("charset is null");
+            throw new IllegalArgumentException("charset == null");
         }
-        return new WebSnapshot(url, resource, charset);
+        return new WebSnapshot(uri, resource, charset);
     }
 
-    private WebSnapshot(String url, String resource, Charset charset) {
-        this.url = url;
+    public static WebSnapshot newFailed(URI uri) {
+        if (uri == null) {
+            throw new IllegalArgumentException("uri == null");
+        }
+        return new WebSnapshot(uri, "", Charset.defaultCharset());
+    }
+
+    private WebSnapshot(URI uri, String resource, Charset charset) {
+        this.uri = uri;
         this.resource = resource;
         this.charset = charset;
     }
 
-    public String url() {
-        return this.url;
+    public URI uri() {
+        return this.uri;
     }
 
     public String resouce() {
@@ -43,7 +59,7 @@ public final class WebSnapshot {
     @Override
     public String toString() {
         return "WebSnapshot{" +
-                "url='" + url + '\'' +
+                "uri=" + uri +
                 ", resource='" + resource + '\'' +
                 ", charset=" + charset +
                 '}';
