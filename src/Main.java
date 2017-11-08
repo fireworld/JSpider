@@ -1,4 +1,3 @@
-import cc.colorcat.spider.CoolapkParser;
 import cc.colorcat.spider.JSpider;
 import cc.colorcat.spider.Listener;
 import cc.colorcat.spider.Scrap;
@@ -6,8 +5,6 @@ import cc.colorcat.spider.Scrap;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Arrays;
-import java.util.Comparator;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 public class Main {
 

@@ -1,134 +1,70 @@
 package cc.colorcat.spider;
 
-import cc.colorcat.spider.internal.ParserProxy;
-import com.sun.istack.internal.Nullable;
-
 import java.net.URI;
-import java.util.List;
 
-public class Scrap<T> {
+public class Scrap {
     private final URI uri;
-    private final T data;
-    private final ParserProxy<T> parser;
-    private final Listener<? super T> listener;
+    private String tag;
+    private Object extra;
 
-    private Scrap(Builder<T> builder) {
-        this.uri = builder.uri;
-        this.data = builder.data;
-        this.parser = builder.parser;
-        this.listener = builder.listener;
+    public Scrap(URI uri) {
+        this(uri, "", null);
+    }
+
+    public Scrap(URI uri, String tag) {
+        this(uri, tag, null);
+    }
+
+    public Scrap(URI uri, String tag, Object extra) {
+        this.uri = uri;
+        this.tag = tag;
+        this.extra = extra;
     }
 
     public URI uri() {
         return this.uri;
     }
 
-    public List<Scrap<? extends T>> tryParse(WebSnapshot snapshot) {
-        return parser.parse(this, snapshot);
+    public String tag() {
+        return this.tag;
     }
 
-    public boolean isTarget() {
-        return data != null;
+    @SuppressWarnings("unchecked")
+    public <T> T extra() {
+        return (T) this.extra;
     }
 
-    @Nullable
-    public final T data() {
-        return data;
+    public Scrap newScrap(Object extra) {
+        return newScrap("", extra);
     }
 
-    void deliver() {
-        if (listener != null) {
-            if (isTarget()) {
-                listener.onSuccess(data);
-            } else {
-                listener.onFailure(this);
-            }
-        }
+    public Scrap newScrap(String tag, Object extra) {
+        return new Scrap(this.uri, tag, extra);
     }
 
-    public Builder<T> newBuilder() {
-        return new Builder<>(this);
+    public Scrap newScrapWithJoin(String uri, String tag) {
+        return newScrapWithJoin(uri, tag, null);
+    }
+
+    public Scrap newScrapWithJoin(String uri, String tag, Object extra) {
+        return newScrapWithJoin(URI.create(uri), tag, extra);
+    }
+
+    public Scrap newScrapWithJoin(URI uri, String tag) {
+        return newScrapWithJoin(uri, tag, null);
+    }
+
+    public Scrap newScrapWithJoin(URI uri, String tag, Object extra) {
+        URI newUri = this.uri.resolve(uri);
+        return new Scrap(newUri, tag, extra);
     }
 
     @Override
     public String toString() {
         return "Scrap{" +
                 "uri=" + uri +
-                ", data=" + data +
-                ", parser=" + parser +
-                ", listener=" + listener +
+                ", tag='" + tag + '\'' +
+                ", extra=" + extra +
                 '}';
-    }
-
-
-    public static class Builder<T> {
-        private URI uri;
-        private T data;
-        private ParserProxy<T> parser = new ParserProxy<>();
-        private Listener<? super T> listener;
-
-        public Builder(String uri) {
-            this(URI.create(uri));
-        }
-
-        public Builder(URI uri) {
-            if (uri == null) {
-                throw new NullPointerException("uri == null");
-            }
-            this.uri = uri;
-        }
-
-        private Builder(Scrap<T> scrap) {
-            this.uri = scrap.uri;
-            this.data = scrap.data;
-            this.parser = scrap.parser;
-            this.listener = scrap.listener;
-        }
-
-        public Builder<T> uri(String uri) {
-            return uri(URI.create(uri));
-        }
-
-        public Builder<T> uri(URI uri) {
-            if (uri == null) {
-                throw new NullPointerException("uri == null");
-            }
-            this.uri = uri;
-            return this;
-        }
-
-        public Builder<T> join(String uri) {
-            return join(URI.create(uri));
-        }
-
-        public Builder<T> join(URI uri) {
-            if (uri == null) {
-                throw new NullPointerException("uri == null");
-            }
-            this.uri = this.uri.resolve(uri);
-            return this;
-        }
-
-        public Builder<T> data(T data) {
-            this.data = data;
-            return this;
-        }
-
-        public Builder<T> registerParser(Parser<T> parser) {
-            this.parser.registerParser(parser);
-            return this;
-        }
-
-        public Builder<T> listener(Listener<? super T> listener) {
-            this.listener = listener;
-            return this;
-        }
-
-        public Scrap<T> build() {
-            if (uri == null) {
-                throw new IllegalStateException("no uri");
-            }
-            return new Scrap<>(this);
-        }
     }
 }

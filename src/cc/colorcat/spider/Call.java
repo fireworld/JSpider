@@ -1,6 +1,6 @@
 package cc.colorcat.spider;
 
-public interface Call<T> {
+public interface Call {
 
-    Scrap<T> seed();
+    Scrap seed();
 }

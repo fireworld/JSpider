@@ -1,16 +1,13 @@
 package cc.colorcat.spider;
 
-import com.sun.istack.internal.Nullable;
-
 import java.util.List;
 
-public interface Parser<T> {
+public interface Parser {
 
     /**
      * Parse the {@link WebSnapshot} into {@link Scrap}.
      *
-     * @return instance of {@link Scrap} if success else null
+     * @return {@link List<Scrap>} if success else empty list.
      */
-    @Nullable
-    List<Scrap<? extends T>> parse(Scrap<T> scrap, WebSnapshot snapshot);
+    List<Scrap> parse(Scrap seed, WebSnapshot snapshot);
 }

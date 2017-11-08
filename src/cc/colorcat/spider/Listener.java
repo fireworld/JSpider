@@ -1,8 +1,12 @@
 package cc.colorcat.spider;
 
-public interface Listener<T> {
+import java.net.URI;
 
-    void onSuccess(T data);
+public interface Listener {
 
-    void onFailure(Scrap<? extends T> scrap);
+    boolean filter(Object extra);
+
+    void onSuccess(Scrap scrap);
+
+    void onFailure(URI uri);
 }
