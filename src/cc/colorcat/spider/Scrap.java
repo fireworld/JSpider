@@ -5,7 +5,7 @@ import com.sun.istack.internal.Nullable;
 import java.net.URI;
 
 public class Scrap<T> {
-    private final URI uri;
+    private URI uri;
     private T data;
 
     public Scrap(URI uri, T data) {
@@ -19,6 +19,16 @@ public class Scrap<T> {
 
     public final URI uri() {
         return this.uri;
+    }
+
+    public final Scrap<T> join(String url) {
+        uri = uri.resolve(url);
+        return this;
+    }
+
+    public final Scrap<T> join(URI uri) {
+        this.uri = this.uri.resolve(uri);
+        return this;
     }
 
     @Nullable
