@@ -56,6 +56,10 @@ public final class WebSnapshot {
         return this.charset;
     }
 
+    public boolean isSuccess() {
+        return !Utils.isEmpty(resource);
+    }
+
     @Override
     public String toString() {
         return "WebSnapshot{" +

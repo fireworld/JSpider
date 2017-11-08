@@ -2,6 +2,8 @@ package cc.colorcat.spider;
 
 import com.sun.istack.internal.Nullable;
 
+import java.util.List;
+
 public interface Parser<T> {
 
     /**
@@ -10,5 +12,5 @@ public interface Parser<T> {
      * @return instance of {@link Scrap} if success else null
      */
     @Nullable
-    Scrap<? extends T> parse(WebSnapshot snapshot);
+    List<Scrap<? extends T>> parse(Scrap<T> scrap, WebSnapshot snapshot);
 }

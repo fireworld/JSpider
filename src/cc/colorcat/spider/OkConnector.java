@@ -39,7 +39,7 @@ public class OkConnector implements Connector {
 
     @SuppressWarnings("CloneDoesntCallSuperClone")
     @Override
-    protected OkConnector clone() {
+    public OkConnector clone() {
         return new OkConnector(client);
     }
 }
