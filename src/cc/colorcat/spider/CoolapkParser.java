@@ -15,7 +15,7 @@ public class CoolapkParser implements Parser<String> {
     public List<Scrap<? extends String>> parse(Scrap<String> scrap, WebSnapshot snapshot) {
         List<Scrap<? extends String>> result = new LinkedList<>();
         Document doc = Jsoup.parse(snapshot.resource());
-        Elements es = doc.select("img[src~=^(http)(s)?://(.)*\\.(png|jpg|jpeg)");
+        Elements es = doc.select("img[src~=^(http)(s)?://(.)*\\.(png|jpg|jpeg)$]");
         for (Element e : es) {
             String imgUrl = e.attr("src");
             result.add(scrap.newBuilder().data(scrap.uri().resolve(imgUrl).toString()).build());
