@@ -10,7 +10,7 @@ public final class WebSnapshot {
     private String resource;
     private Charset charset;
 
-    public static WebSnapshot newSucdess(String uri, String resource, String charset) {
+    public static WebSnapshot newSuccess(String uri, String resource, String charset) {
         return newSuccess(URI.create(uri), resource, Charset.forName(charset));
     }
 
@@ -48,7 +48,7 @@ public final class WebSnapshot {
         return this.uri;
     }
 
-    public String resouce() {
+    public String resource() {
         return this.resource;
     }
 
