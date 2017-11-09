@@ -1,6 +1,17 @@
 package cc.colorcat.spider;
 
-public interface Call {
+import java.io.IOException;
+
+public interface Call extends Runnable {
+
+    int count();
 
     Scrap seed();
+
+    void execute() throws IOException;
+
+    interface Factory {
+
+        Call newCall(Scrap seed);
+    }
 }

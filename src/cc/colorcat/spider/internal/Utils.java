@@ -4,10 +4,25 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.*;
 
 public final class Utils {
     public static final Charset UTF8 = Charset.forName("UTF-8");
     private static final String REG_HTTP_URL = "^(http)(s)?://(.)+";
+
+    public static <K, V> Map<K, V> immutableMap(Map<K, V> map) {
+        if (map == null || map.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return Collections.unmodifiableMap(new HashMap<>(map));
+    }
+
+    public static <T> List<T> immutableList(List<T> list) {
+        if (list == null || list.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(new ArrayList<>(list));
+    }
 
     public static boolean isHttpUrl(String url) {
         return url != null && url.toLowerCase().matches(REG_HTTP_URL);

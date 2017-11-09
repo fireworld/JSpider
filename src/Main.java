@@ -1,10 +1,8 @@
-import cc.colorcat.spider.JSpider;
-import cc.colorcat.spider.Listener;
-import cc.colorcat.spider.Scrap;
-
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Main {
 
@@ -29,19 +27,46 @@ public class Main {
 //        set.remove(s2);
 //        System.out.println(set);
 
-        Scrap<String> scrap = new Scrap.Builder<String>(URI.create("https://www.coolapk.com/apk/"))
-                .registerParser(new CoolapkParser())
-                .listener(new Listener<String>() {
-                    @Override
-                    public void onSuccess(String data) {
-                        System.out.println("onSuccess, data = " + data);
-                    }
+//        Scrap<String> scrap = new Scrap.Builder<String>(URI.create("https://www.coolapk.com/apk/"))
+//                .registerParser(new CoolapkParser())
+//                .listener(new Listener<String>() {
+//                    @Override
+//                    public void onSuccess(String data) {
+//                        System.out.println("onSuccess, data = " + data);
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Scrap<? extends String> scrap) {
+//                        System.out.println("onFailure, scrap = " + scrap);
+//                    }
+//                }).build();
+//        new JSpider().seed(Arrays.asList(scrap));
+        test();
+    }
 
-                    @Override
-                    public void onFailure(Scrap<? extends String> scrap) {
-                        System.out.println("onFailure, scrap = " + scrap);
-                    }
-                }).build();
-        new JSpider().seed(Arrays.asList(scrap));
+
+    private static void test() {
+//        List<String> ls = new ArrayList<>();
+//        List<CharSequence> lc = new ArrayList<>();
+//        Class c1 = ls.getClass();
+//        Class c2 = lc.getClass();
+//        System.out.println(c1);
+//        System.out.println(c2);
+//        System.out.println(c1 == c2);
+//        System.out.println(c1.getTypeName());
+//        Class c3 = List.class;
+//        System.out.println(c3);
+//        System.out.println(c3.isAssignableFrom(c1));
+        Map<String, String> m1 = new HashMap<>();
+        m1.put("1", "test1");
+        m1.put("2", "test2");
+        System.out.println("original m1: " + m1);
+        Map<String, String> m2 = new HashMap<>();
+        m2.put("2", "test22");
+        m2.put("3", "test23");
+        System.out.println("original m2: " + m2);
+        m1.putAll(m2);
+        System.out.println("after put all, m1: " + m1);
+        System.out.println("after put all, m2: " + m2);
     }
 }
