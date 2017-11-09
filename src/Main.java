@@ -1,8 +1,5 @@
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Main {
 
@@ -57,16 +54,20 @@ public class Main {
 //        Class c3 = List.class;
 //        System.out.println(c3);
 //        System.out.println(c3.isAssignableFrom(c1));
-        Map<String, String> m1 = new HashMap<>();
-        m1.put("1", "test1");
+        Map<String, String> m1 = new LinkedHashMap<>();
         m1.put("2", "test2");
+        m1.put("1", "test1");
         System.out.println("original m1: " + m1);
-        Map<String, String> m2 = new HashMap<>();
+        Map<String, String> m2 = new LinkedHashMap<>();
         m2.put("2", "test22");
         m2.put("3", "test23");
         System.out.println("original m2: " + m2);
         m1.putAll(m2);
         System.out.println("after put all, m1: " + m1);
         System.out.println("after put all, m2: " + m2);
+        Map<String, String> hash = new HashMap<>();
+        hash.put("2", "hash2");
+        hash.put("1", "hash1");
+        System.out.println(hash);
     }
 }

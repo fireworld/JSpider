@@ -45,6 +45,10 @@ public class JSpider {
         return 3;
     }
 
+    int maxSeedOnRunning() {
+        return 20;
+    }
+
     public static class Builder {
         private Map<String, List<Handler>> handlers;
         private List<Interceptor> interceptors;

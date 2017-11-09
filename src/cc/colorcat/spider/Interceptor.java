@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface Interceptor {
 
-    Scrap intercept(Chain chain) throws IOException;
+    List<Scrap> intercept(Chain chain) throws IOException;
 
     interface Chain {
         Connection connection();

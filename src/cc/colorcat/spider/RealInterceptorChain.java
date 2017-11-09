@@ -27,7 +27,7 @@ final class RealInterceptorChain implements Interceptor.Chain {
     }
 
     @Override
-    public Scrap proceed(Scrap seed) throws IOException {
+    public List<Scrap> proceed(Scrap seed) throws IOException {
         RealInterceptorChain next = new RealInterceptorChain(interceptors, index + 1, seed, connection);
         Interceptor interceptor = interceptors.get(index);
         return interceptor.intercept(next);
