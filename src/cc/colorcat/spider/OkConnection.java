@@ -36,7 +36,9 @@ public class OkConnection implements Connection {
                 }
             }
         }
-        if (snapshot == null) snapshot = WebSnapshot.newFailed(uri);
+        if (snapshot == null) {
+            throw new IOException("response, code = " + response.code() + ", msg = " + response.message());
+        }
         return snapshot;
     }
 

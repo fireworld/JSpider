@@ -58,16 +58,18 @@ public class Scrap {
         return Utils.immutableMap(data);
     }
 
-    public void fill(Map<String, String> data) {
+    public Scrap fill(Map<String, String> data) {
         if (data != null) {
             original().putAll(data);
         }
+        return this;
     }
 
-    public void fill(String key, String value) {
+    public Scrap fill(String key, String value) {
         if (key != null && value != null) {
             original().put(key, value);
         }
+        return this;
     }
 
     private Map<String, String> original() {

@@ -1,44 +1,51 @@
-import java.net.MalformedURLException;
+import cc.colorcat.spider.Handler;
+import cc.colorcat.spider.JSpider;
+import cc.colorcat.spider.Scrap;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
 import java.util.*;
 
 public class Main {
+    public static final OkHttpClient CLIENT;
+    public static final JSpider SPIDER;
 
-    public static void main(String[] args) throws MalformedURLException {
-//        String url = "http://www.baidu.com:80/test/tomato/search.html";
-//        URI uri = URI.create(url);
-//        String path = "../hello/world/test.png";
-//        URI newUri = uri.resolve(path);
-//        System.out.println("original uri = " + uri.toString());
-//        System.out.println("new path = " + path);
-//        System.out.println("new uri = " + newUri);
+    private static final Handler COOL_HANDLER = new Handler() {
+        @Override
+        public boolean handle(Scrap scrap) {
+            Map<String, String> data = scrap.data();
+            String url = data.get("url");
+            if (url != null && url.matches("^(http)(s)?://(.)*\\.(jpg|png|jpeg)$")) {
+                System.out.println("fetch img success, url = " + url);
+                return true;
+            }
+            return false;
+        }
+    };
 
-//        String baidu1 = "http://www.baidu.com";
-//        String baidu2 = "HTTP://WWW.BAIDU.COM";
-//        Scrap<String> s1 = new Scrap.Builder<String>(baidu1).build();
-//        Scrap<String> s2 = new Scrap.Builder<String>(baidu2).data("haha").build();
-//        ConcurrentSkipListSet<Scrap<?>> set = new ConcurrentSkipListSet<>(Comparator.comparing(Scrap::uri));
-//        set.add(s1);
-//        System.out.println(set.contains(s2));
-//        set.add(s2);
-//        System.out.println(set);
-//        set.remove(s2);
-//        System.out.println(set);
+    static {
+        SPIDER = new JSpider.Builder()
+                .addParser(new CoolapkParser())
+                .registerHandler("cool", COOL_HANDLER)
+                .build();
 
-//        Scrap<String> scrap = new Scrap.Builder<String>(URI.create("https://www.coolapk.com/apk/"))
-//                .registerParser(new CoolapkParser())
-//                .listener(new Listener<String>() {
-//                    @Override
-//                    public void onSuccess(String data) {
-//                        System.out.println("onSuccess, data = " + data);
-//                    }
-//
-//                    @Override
-//                    public void onFailure(Scrap<? extends String> scrap) {
-//                        System.out.println("onFailure, scrap = " + scrap);
-//                    }
-//                }).build();
-//        new JSpider().seed(Arrays.asList(scrap));
-        test();
+        CLIENT = new OkHttpClient();
+    }
+
+    public static void main(String[] args) throws IOException {
+        String url = "https://www.coolapk.com/apk/";
+        SPIDER.start(Scrap.newScraps("cool", Arrays.asList(url)));
+//        String resource = CLIENT.newCall(new Request.Builder().url(url).get().build()).execute().body().string();
+//        Document doc = Jsoup.parse(resource);
+//        Elements elements = doc.select("img[src~=^(http)(s)?://(.)*\\.(jpg|png|jpeg)$]");
+//        for (Element e : elements) {
+//            System.out.println("jsoup success, img = " + e.attr("src"));
+//        }
     }
 
 

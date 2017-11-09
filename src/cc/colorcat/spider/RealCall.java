@@ -76,6 +76,7 @@ final class RealCall implements Call {
         Iterator<Scrap> iterable = scraps.iterator();
         while (iterable.hasNext()) {
             Scrap scrap = iterable.next();
+            if (scrap.data().isEmpty()) continue;
             boolean handled = false;
             List<Handler> handlers = spider.handlers(scrap.tag());
             for (Handler handler : handlers) {
@@ -111,7 +112,10 @@ final class RealCall implements Call {
 
     private List<Scrap> getScrapsWitInterceptorChain() throws IOException {
         count++;
-        List<Interceptor> interceptors = new ArrayList<>(spider.interceptors());
+        List<Interceptor> users = spider.interceptors();
+        List<Interceptor> interceptors = new ArrayList<>(users.size() + 1);
+        interceptors.addAll(users);
+        interceptors.add(new ParserInterceptor(spider.parsers()));
         Interceptor.Chain chain = new RealInterceptorChain(interceptors, 0, seed, connection);
         return chain.proceed(seed);
     }

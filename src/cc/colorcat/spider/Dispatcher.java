@@ -1,5 +1,7 @@
 package cc.colorcat.spider;
 
+import cc.colorcat.spider.internal.Log;
+
 import java.net.URI;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -7,20 +9,28 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 final class Dispatcher {
-    private ExecutorService service;
-    private JSpider spider;
-    private LinkedHashMap<URI, Call> finished = new LinkedHashMap<>();
-    private LinkedHashMap<URI, Call> waiting = new LinkedHashMap<>();
-    private LinkedHashMap<URI, Call> running = new LinkedHashMap<>();
+    private final JSpider spider;
+    private final ExecutorService executor;
+    private final LinkedHashMap<URI, Call> finished = new LinkedHashMap<>();
+    private final LinkedHashMap<URI, Call> waiting = new LinkedHashMap<>();
+    private final LinkedHashMap<URI, Call> running = new LinkedHashMap<>();
+
+    Dispatcher(JSpider spider, ExecutorService executor) {
+        this.spider = spider;
+        this.executor = executor;
+    }
 
     synchronized void enqueue(Scrap scrap) {
+        enqueue(new RealCall(spider, scrap));
     }
 
     synchronized void enqueue(List<Scrap> scraps) {
-
+        for (Scrap scrap : scraps) {
+            enqueue(new RealCall(spider, scrap));
+        }
     }
 
-    private synchronized void enqueue(RealCall call) {
+    private void enqueue(RealCall call) {
         URI uri = call.seed().uri();
         if (!contains(uri)) {
             waiting.put(uri, call);
@@ -28,17 +38,19 @@ final class Dispatcher {
         }
     }
 
-    private synchronized void promoteCalls() {
+    private void promoteCalls() {
         if (running.size() >= spider.maxSeedOnRunning()) return;
         if (!waiting.isEmpty()) {
             Iterator<Call> values = waiting.values().iterator();
             while (values.hasNext()) {
                 Call call = values.next();
                 running.put(call.seed().uri(), call);
-                service.submit(call);
+                executor.submit(call);
                 values.remove();
                 if (running.size() >= spider.maxSeedOnRunning()) break;
             }
+        } else if (running.isEmpty()) {
+            logAllFailed();
         }
     }
 
@@ -66,6 +78,17 @@ final class Dispatcher {
     }
 
     private synchronized boolean contains(URI uri) {
-        return !running.containsKey(uri) && !waiting.containsKey(uri) && !finished.containsKey(uri);
+        return running.containsKey(uri) || waiting.containsKey(uri) || finished.containsKey(uri);
+    }
+
+    private void logAllFailed() {
+        synchronized (finished) {
+            Log.i("---------------------All task finished---------------------");
+            for (Call call : finished.values()) {
+                if (call.count() >= spider.maxRetry()) {
+                    Log.w("Failed task, uri = " + call.seed().uri().toString());
+                }
+            }
+        }
     }
 }
