@@ -6,13 +6,19 @@ import okhttp3.*;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class OkConnection implements Connection {
     private OkHttpClient client;
     private WebSnapshot snapshot;
 
     public OkConnection() {
-        client = new OkHttpClient.Builder().build();
+        client = new OkHttpClient.Builder()
+                .build();
     }
 
     public OkConnection(OkHttpClient client) {

@@ -21,7 +21,7 @@ final class RealCall implements Call {
     }
 
     @Override
-    public int count() {
+    public synchronized int count() {
         return count;
     }
 

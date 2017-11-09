@@ -19,6 +19,7 @@ public class JSpider {
     private final boolean depthFirst;
     private final int maxRetry;
     private final int maxSeedOnRunning;
+    private final EventListener listener;
 
     private JSpider(Builder builder) {
         this.handlers = Utils.immutableMap(builder.handlers);
@@ -30,6 +31,7 @@ public class JSpider {
         this.depthFirst = builder.depthFirst;
         this.maxRetry = builder.maxRetry;
         this.maxSeedOnRunning = builder.maxSeedOnRunning;
+        this.listener = builder.listener;
     }
 
     ExecutorService executor() {
@@ -68,23 +70,32 @@ public class JSpider {
         return maxSeedOnRunning;
     }
 
+    EventListener listener() {
+        return listener;
+    }
+
     public void start(List<Scrap> scraps) {
+        listener.onCrawlStart(scraps);
         this.dispatcher.enqueue(scraps);
     }
 
     public static class Builder {
-        private Map<String, List<Handler>> handlers = new HashMap<>();
-        private List<Interceptor> interceptors = new ArrayList<>(6);
-        private List<Parser> parsers = new ArrayList<>(16);
-        private Connection connection = new OkConnection();
+        private Map<String, List<Handler>> handlers;
+        private List<Interceptor> interceptors;
+        private List<Parser> parsers;
+        private Connection connection;
         private ExecutorService executor;
         private Dispatcher dispatcher;
         private boolean depthFirst = false;
         private int maxRetry = 3;
         private int maxSeedOnRunning = 20;
+        private EventListener listener;
 
         public Builder() {
-
+            handlers = new HashMap<>();
+            interceptors = new ArrayList<>();
+            parsers = new ArrayList<>();
+            listener = EventListener.EMPTY_LISTENER;
         }
 
         public Builder registerHandler(String tag, Handler handler) {
@@ -101,6 +112,16 @@ public class JSpider {
             return this;
         }
 
+        public Builder addInterceptor(Interceptor interceptor) {
+            if (interceptor == null) {
+                throw new NullPointerException("interceptor == null");
+            }
+            if (!this.interceptors.contains(interceptor)) {
+                this.interceptors.add(interceptor);
+            }
+            return this;
+        }
+
         public Builder addParser(Parser parser) {
             if (parser == null) {
                 throw new NullPointerException("parser == null");
@@ -111,14 +132,52 @@ public class JSpider {
             return this;
         }
 
-        public Builder addInterceptor(Interceptor interceptor) {
-            if (interceptor == null) {
-                throw new NullPointerException("interceptor == null");
+        public Builder connection(Connection connection) {
+            if (connection == null) {
+                throw new NullPointerException("connection == null");
             }
+            this.connection = connection;
+            return this;
+        }
+
+        public Builder executor(ExecutorService executor) {
+            if (executor == null) {
+                throw new NullPointerException("executor == null");
+            }
+            this.executor = executor;
+            return this;
+        }
+
+        public Builder depthFirst(boolean depthFirst) {
+            this.depthFirst = depthFirst;
+            return this;
+        }
+
+        public Builder maxRetry(int maxRetry) {
+            if (maxRetry < 1) {
+                throw new IllegalArgumentException("maxRetry < 1");
+            }
+            this.maxRetry = maxRetry;
+            return this;
+        }
+
+        public Builder maxSeedOnRunning(int maxSeedOnRunning) {
+            if (maxSeedOnRunning < 1) {
+                throw new IllegalArgumentException("maxSeedOnRunning < 1");
+            }
+            this.maxSeedOnRunning = maxSeedOnRunning;
+            return this;
+        }
+
+        public Builder eventListener(EventListener listener) {
+            this.listener = Utils.nullElse(listener, EventListener.EMPTY_LISTENER);
             return this;
         }
 
         public JSpider build() {
+            if (connection == null) {
+                connection = new OkConnection();
+            }
             if (executor == null) {
                 executor = Executors.newCachedThreadPool();
             }

@@ -3,14 +3,13 @@ package cc.colorcat.spider;
 import cc.colorcat.spider.internal.Log;
 
 import java.net.URI;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 
 final class Dispatcher {
     private final JSpider spider;
     private final ExecutorService executor;
+    private final List<Scrap> handled = new LinkedList<>();
     private final LinkedHashMap<URI, Call> finished = new LinkedHashMap<>();
     private final LinkedHashMap<URI, Call> waiting = new LinkedHashMap<>();
     private final LinkedHashMap<URI, Call> running = new LinkedHashMap<>();
@@ -61,7 +60,8 @@ final class Dispatcher {
 
     // 从 running 中移除，并根据情况添加至 finished 或 waiting
     synchronized void finished(RealCall call, boolean success) {
-        URI uri = call.seed().uri();
+        Scrap scrap = call.seed();
+        URI uri = scrap.uri();
         running.remove(uri);
         if (success || call.count() >= spider.maxRetry()) {
             finished.put(uri, call);
@@ -69,12 +69,19 @@ final class Dispatcher {
         } else {
             enqueue(call);
         }
+        EventListener listener = spider.listener();
+        if (success) {
+            listener.onCrawlSuccess(scrap);
+        } else {
+            listener.onCrawlFailed(scrap);
+        }
     }
 
     synchronized void handled(Scrap scrap) {
         URI uri = scrap.uri();
         waiting.remove(uri);
-        finished.put(uri, new EmptyCall(scrap));
+        handled.add(scrap);
+        spider.listener().onCrawledData(scrap);
     }
 
     private synchronized boolean contains(URI uri) {
@@ -83,12 +90,17 @@ final class Dispatcher {
 
     private void logAllFailed() {
         synchronized (finished) {
-            Log.i("---------------------All task finished---------------------");
-            for (Call call : finished.values()) {
+            Collection<Call> scraps = finished.values();
+            List<Scrap> all = new ArrayList<>(scraps.size());
+            List<Scrap> failed = new ArrayList<>();
+            for (Call call : scraps) {
+                Scrap scrap = call.seed();
+                all.add(scrap);
                 if (call.count() >= spider.maxRetry()) {
-                    Log.w("Failed task, uri = " + call.seed().uri().toString());
+                    failed.add(scrap);
                 }
             }
+            spider.listener().onCrawlFinished(all, failed);
         }
     }
 }

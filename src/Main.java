@@ -1,80 +1,127 @@
-import cc.colorcat.spider.Handler;
-import cc.colorcat.spider.JSpider;
-import cc.colorcat.spider.Scrap;
+import cc.colorcat.spider.*;
+import cc.colorcat.spider.EventListener;
+import cc.colorcat.spider.internal.Log;
+import cc.colorcat.spider.internal.Utils;
+import okhttp3.Cookie;
+import okhttp3.CookieJar;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
+    public static final CookieJar COOKIE_JAR;
     public static final OkHttpClient CLIENT;
     public static final JSpider SPIDER;
+    public static final File SAVE_DIR;
 
-    private static final Handler COOL_HANDLER = new Handler() {
+
+    static {
+        SAVE_DIR = new File("/Users/cxx/Pictures/spider");
+
+        COOKIE_JAR = new CookieJar() {
+            private Map<String, List<Cookie>> cookies = new ConcurrentHashMap<>();
+
+            @Override
+            public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
+                this.cookies.put(url.host(), cookies);
+            }
+
+            @Override
+            public List<Cookie> loadForRequest(HttpUrl url) {
+                List<Cookie> cookies = this.cookies.get(url.host());
+                return cookies != null ? cookies : Collections.emptyList();
+            }
+        };
+
+        CLIENT = new OkHttpClient.Builder()
+                .cookieJar(COOKIE_JAR)
+                .connectTimeout(3, TimeUnit.SECONDS)
+                .readTimeout(3, TimeUnit.SECONDS)
+                .build();
+
+        SPIDER = new JSpider.Builder()
+                .addParser(new TestPaserNext())
+                .addParser(new TestParserImage())
+                .registerHandler("image", new ImageHandler(new Downloader(CLIENT), SAVE_DIR))
+                .eventListener(new LogListener())
+                .connection(new OkConnection(CLIENT))
+                .build();
+    }
+
+    public static void main(String[] args) throws IOException {
+        String url = "http://www.mmjpg.com/mm/302";
+        Map<String, String> def = new HashMap<>();
+        def.put("dir", "mm");
+        SPIDER.start(Scrap.newScraps("image", Arrays.asList(url), def));
+    }
+
+    private static class ImageHandler implements Handler {
+        private Downloader downloader;
+        private File directory;
+
+
+        private ImageHandler(Downloader downloader, File directory) {
+            this.downloader = downloader;
+            this.directory = directory;
+        }
+
         @Override
+
         public boolean handle(Scrap scrap) {
             Map<String, String> data = scrap.data();
             String url = data.get("url");
             if (url != null && url.matches("^(http)(s)?://(.)*\\.(jpg|png|jpeg)$")) {
-                System.out.println("fetch img success, url = " + url);
+                String name = url.substring(url.lastIndexOf('/'), url.length());
+                String dirS = data.get("dir");
+                File savePath = directory;
+                if (!Utils.isEmpty(dirS)) {
+                    savePath = new File(savePath, dirS);
+                }
+                savePath = new File(savePath, name);
+                int count = 1;
+                while (savePath.exists()) {
+                    savePath = new File(directory, count + "_" + name);
+                }
+                downloader.submit(url, savePath);
                 return true;
             }
             return false;
         }
-    };
 
-    static {
-        SPIDER = new JSpider.Builder()
-                .addParser(new CoolapkParser())
-                .registerHandler("cool", COOL_HANDLER)
-                .build();
-
-        CLIENT = new OkHttpClient();
     }
 
-    public static void main(String[] args) throws IOException {
-        String url = "https://www.coolapk.com/apk/";
-        SPIDER.start(Scrap.newScraps("cool", Arrays.asList(url)));
-//        String resource = CLIENT.newCall(new Request.Builder().url(url).get().build()).execute().body().string();
-//        Document doc = Jsoup.parse(resource);
-//        Elements elements = doc.select("img[src~=^(http)(s)?://(.)*\\.(jpg|png|jpeg)$]");
-//        for (Element e : elements) {
-//            System.out.println("jsoup success, img = " + e.attr("src"));
-//        }
-    }
+    private static class LogListener implements EventListener {
+        @Override
+        public void onCrawlStart(List<Scrap> seeds) {
+            Log.i("onCrawlStart, seeds = " + seeds.toString());
+        }
 
+        @Override
+        public void onCrawlSuccess(Scrap scrap) {
+            Log.i("onCrawlSuccess, scrap = " + scrap.toString());
+        }
 
-    private static void test() {
-//        List<String> ls = new ArrayList<>();
-//        List<CharSequence> lc = new ArrayList<>();
-//        Class c1 = ls.getClass();
-//        Class c2 = lc.getClass();
-//        System.out.println(c1);
-//        System.out.println(c2);
-//        System.out.println(c1 == c2);
-//        System.out.println(c1.getTypeName());
-//        Class c3 = List.class;
-//        System.out.println(c3);
-//        System.out.println(c3.isAssignableFrom(c1));
-        Map<String, String> m1 = new LinkedHashMap<>();
-        m1.put("2", "test2");
-        m1.put("1", "test1");
-        System.out.println("original m1: " + m1);
-        Map<String, String> m2 = new LinkedHashMap<>();
-        m2.put("2", "test22");
-        m2.put("3", "test23");
-        System.out.println("original m2: " + m2);
-        m1.putAll(m2);
-        System.out.println("after put all, m1: " + m1);
-        System.out.println("after put all, m2: " + m2);
-        Map<String, String> hash = new HashMap<>();
-        hash.put("2", "hash2");
-        hash.put("1", "hash1");
-        System.out.println(hash);
+        @Override
+        public void onCrawlFailed(Scrap scrap) {
+            Log.w("onCrawlFailed, scrap = " + scrap.toString());
+        }
+
+        @Override
+        public void onCrawledData(Scrap data) {
+            Log.i("onCrawledData, data = " + data.toString());
+        }
+
+        @Override
+        public void onCrawlFinished(List<Scrap> all, List<Scrap> failed) {
+            Log.i("onCrawlFinished, all = " + all.toString());
+            Log.w("onCrawlFinished, failed = " + failed);
+        }
     }
 }
