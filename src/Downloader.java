@@ -21,28 +21,24 @@ public class Downloader {
     }
 
     public void download(String url, File savePath) throws IOException {
-        if (createDir(savePath)) {
-            Response response = client.newCall(new Request.Builder().url(url).get().build()).execute();
-            write(response, savePath);
-        }
+        Response response = client.newCall(new Request.Builder().url(url).get().build()).execute();
+        write(response, savePath);
     }
 
     public void submit(String url, File savePath) {
-        if (createDir(savePath)) {
-            client.newCall(new Request.Builder().url(url).get().build()).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    Log.w("Download failure, url = " + call.request().url());
-                    Log.e(e);
-                }
+        client.newCall(new Request.Builder().url(url).get().build()).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.w("Download failure, url = " + call.request().url());
+                Log.e(e);
+            }
 
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    write(response, savePath);
-                    Log.w("Download success, url = " + call.request().url());
-                }
-            });
-        }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                write(response, savePath);
+                Log.w("Download success, url = " + call.request().url());
+            }
+        });
     }
 
     private static boolean createDir(File savePath) {

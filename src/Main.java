@@ -82,8 +82,8 @@ public class Main {
     }
 
     private static class ImageHandler implements Handler {
-        private Downloader downloader;
-        private File directory;
+        private final Downloader downloader;
+        private final File directory;
 
 
         private ImageHandler(Downloader downloader, File directory) {
@@ -97,24 +97,37 @@ public class Main {
             Map<String, String> data = scrap.data();
             String url = data.get("url");
             if (url != null && url.matches("^(http)(s)?://(.)*\\.(jpg|png|jpeg)$")) {
-                String name = url.substring(url.lastIndexOf('/') + 1, url.length());
-                String dirS = data.get("dir");
-                File folder = directory;
-                if (!Utils.isEmpty(dirS)) {
-                    folder = new File(folder, dirS);
-                }
-                File savePath = new File(folder, name);
-                int count = 1;
-                while (savePath.exists()) {
-                    savePath = new File(folder, count + "_" + name);
-                    count++;
-                }
-                downloader.submit(url, savePath);
+                String fileName = url.substring(url.lastIndexOf('/') + 1, url.length());
+                String folderName = data.get("dir");
+                downloader.submit(url, makePath(folderName, fileName));
                 return true;
             }
             return false;
         }
 
+        private File makePath(String folderName, String fileName) {
+            File folder = directory;
+            if (folderName != null && !folderName.isEmpty()) {
+                folder = new File(folder, folderName);
+            }
+            if (folder.exists() || folder.mkdirs()) {
+                String baseName, extName;
+                int dot = fileName.lastIndexOf('.');
+                if (dot != -1) {
+                    baseName = fileName.substring(0, dot);
+                    extName = fileName.substring(dot, fileName.length());
+                } else {
+                    baseName = fileName;
+                    extName = "";
+                }
+                File savePath = new File(folder, baseName + extName);
+                for (int i = 0; savePath.exists(); i++) {
+                    savePath = new File(folder, baseName + "_" + i + extName);
+                }
+                return savePath;
+            }
+            throw new RuntimeException("create directory failed, path = " + folder.toString());
+        }
     }
 
     private static class LogListener implements EventListener {
