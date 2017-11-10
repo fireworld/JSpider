@@ -124,7 +124,7 @@ public class Scrap {
         if (data == null) {
             throw new NullPointerException("data == null");
         }
-        return new Scrap(tag, uri, new HashMap<>(data)).fill(data);
+        return new Scrap(tag, uri, new HashMap<>(this.data)).fill(data);
     }
 
     public Scrap newScrap(String uri) {
