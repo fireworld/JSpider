@@ -1,5 +1,7 @@
 package cc.colorcat.spider;
 
+import cc.colorcat.spider.internal.Log;
+
 import java.net.URI;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -75,7 +77,8 @@ final class Dispatcher {
             finished.put(uri, call);
             promoteCalls();
         }
-
+        Log.d("running size = " + running.size());
+        Log.w("waiting size = " + waiting.size());
 //        if (success || call.count() >= spider.maxTry()) {
 //            finished.put(uri, call);
 //            promoteCalls();

@@ -139,9 +139,17 @@ public class Main {
 
         @Override
         public void onFinished(List<Scrap> allSeeds, List<Scrap> failedSeeds, List<Scrap> handledScraps) {
-            Log.i("onFinished, all = " + allSeeds.toString());
-            Log.w("onFinished, failed = " + failedSeeds.toString());
-            Log.i("onFinished, handled = " + handledScraps.toString());
+            Log("AllSeeds", allSeeds);
+            Log("failedSeeds", failedSeeds);
+            Log("handledScraps", handledScraps);
+        }
+
+        private static void Log(String tag, List<Scrap> scraps) {
+            System.out.println("------------------------------- " + tag + " -------------------------------");
+            for (Scrap scrap : scraps) {
+                System.out.println(scrap);
+            }
+            System.out.println("----------------------------------------------------------------------");
         }
     }
 }
