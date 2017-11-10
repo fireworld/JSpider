@@ -12,6 +12,10 @@ import okio.Okio;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Created by cxx on 17-11-9.
+ * xx.ch@outlook.com
+ */
 public class Downloader {
 
     private OkHttpClient client;

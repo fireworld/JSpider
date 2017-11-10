@@ -2,6 +2,10 @@ package cc.colorcat.spider;
 
 import java.util.List;
 
+/**
+ * Created by cxx on 17-11-9.
+ * xx.ch@outlook.com
+ */
 public interface Parser {
 
     /**

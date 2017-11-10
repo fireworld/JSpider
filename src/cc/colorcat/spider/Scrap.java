@@ -7,6 +7,10 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.*;
 
+/**
+ * Created by cxx on 17-11-9.
+ * xx.ch@outlook.com
+ */
 public class Scrap {
     private final String tag;
     private final URI uri;

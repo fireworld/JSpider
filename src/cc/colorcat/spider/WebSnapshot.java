@@ -5,6 +5,10 @@ import cc.colorcat.spider.internal.Utils;
 import java.net.URI;
 import java.nio.charset.Charset;
 
+/**
+ * Created by cxx on 17-11-9.
+ * xx.ch@outlook.com
+ */
 public final class WebSnapshot {
     private URI uri;
     private String resource;

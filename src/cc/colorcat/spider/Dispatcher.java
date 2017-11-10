@@ -6,6 +6,10 @@ import java.net.URI;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 
+/**
+ * Created by cxx on 17-11-9.
+ * xx.ch@outlook.com
+ */
 final class Dispatcher {
     private final JSpider spider;
     private final ExecutorService executor;

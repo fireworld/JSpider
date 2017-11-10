@@ -1,5 +1,4 @@
 import cc.colorcat.spider.*;
-import cc.colorcat.spider.EventListener;
 import cc.colorcat.spider.internal.Log;
 import cc.colorcat.spider.internal.Utils;
 import okhttp3.Cookie;
@@ -8,13 +7,18 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Created by cxx on 17-11-9.
+ * xx.ch@outlook.com
+ */
 public class Main {
     public static final CookieJar COOKIE_JAR;
     public static final OkHttpClient CLIENT;
@@ -47,8 +51,8 @@ public class Main {
                 .build();
 
         SPIDER = new JSpider.Builder()
-                .addParser(new TestPaserNext())
-                .addParser(new TestParserImage())
+//                .addParser(new TestPaserNext())
+//                .addParser(new TestParserImage())
                 .registerHandler("image", new ImageHandler(new Downloader(CLIENT), SAVE_DIR))
                 .eventListener(new LogListener())
                 .connection(new OkConnection(CLIENT))
@@ -56,10 +60,9 @@ public class Main {
     }
 
     public static void main(String[] args) throws IOException {
-        String url = "http://www.mmjpg.com/mm/302";
         Map<String, String> def = new HashMap<>();
         def.put("dir", "mm");
-        SPIDER.start(Scrap.newScraps("image", Arrays.asList(url), def));
+//        SPIDER.start(Scrap.newScraps("image", Arrays.asList(url), def));
     }
 
     private static class ImageHandler implements Handler {

@@ -9,6 +9,10 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Created by cxx on 17-11-9.
+ * xx.ch@outlook.com
+ */
 public class JSpider {
     private final Map<String, List<Handler>> handlers;
     private final List<Interceptor> interceptors;

@@ -6,6 +6,10 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.*;
 
+/**
+ * Created by cxx on 17-11-9.
+ * xx.ch@outlook.com
+ */
 public final class Utils {
     public static final Charset UTF8 = Charset.forName("UTF-8");
     private static final String REG_HTTP_URL = "^(http)(s)?://(.)+";

@@ -1,5 +1,9 @@
 package cc.colorcat.spider;
 
+/**
+ * Created by cxx on 17-11-9.
+ * xx.ch@outlook.com
+ */
 final class EmptyCall implements Call {
     private final Scrap scrap;
 

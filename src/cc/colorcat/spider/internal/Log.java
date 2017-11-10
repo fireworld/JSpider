@@ -3,6 +3,10 @@ package cc.colorcat.spider.internal;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Created by cxx on 17-11-9.
+ * xx.ch@outlook.com
+ */
 public class Log {
     private static final Logger LOGGER;
 

@@ -3,6 +3,10 @@ package cc.colorcat.spider;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Created by cxx on 17-11-9.
+ * xx.ch@outlook.com
+ */
 final class RealInterceptorChain implements Interceptor.Chain {
     private final List<Interceptor> interceptors;
     private final int index;

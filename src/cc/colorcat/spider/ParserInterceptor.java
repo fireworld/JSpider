@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Created by cxx on 17-11-9.
+ * xx.ch@outlook.com
+ */
 class ParserInterceptor implements Interceptor {
     private List<Parser> parsers;
 

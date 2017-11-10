@@ -12,6 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Created by cxx on 17-11-9.
+ * xx.ch@outlook.com
+ */
 public class OkConnection implements Connection {
     private OkHttpClient client;
     private WebSnapshot snapshot;

@@ -8,6 +8,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Created by cxx on 17-11-9.
+ * xx.ch@outlook.com
+ */
 final class RealCall implements Call {
     private final JSpider spider;
     private final Scrap seed;
