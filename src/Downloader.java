@@ -1,10 +1,6 @@
-package cc.colorcat.spider;
-
 import cc.colorcat.spider.internal.Log;
 import cc.colorcat.spider.internal.Utils;
-import javafx.scene.Parent;
 import okhttp3.*;
-import okhttp3.Call;
 import okio.BufferedSink;
 import okio.BufferedSource;
 import okio.Okio;

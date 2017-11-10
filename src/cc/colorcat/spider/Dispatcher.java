@@ -1,7 +1,5 @@
 package cc.colorcat.spider;
 
-import cc.colorcat.spider.internal.Log;
-
 import java.net.URI;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -23,17 +21,17 @@ final class Dispatcher {
         this.executor = executor;
     }
 
-    synchronized void enqueue(Scrap scrap) {
-        enqueue(new RealCall(spider, scrap));
-    }
-
-    synchronized void enqueue(List<Scrap> scraps) {
-        for (Scrap scrap : scraps) {
-            enqueue(new RealCall(spider, scrap));
+    synchronized void enqueue(List<Call> calls) {
+        for (Call call : calls) {
+            URI uri = call.seed().uri();
+            if (!contains(uri)) {
+                waiting.put(uri, call);
+            }
         }
+        promoteCalls();
     }
 
-    private void enqueue(RealCall call) {
+    private void enqueue(Call call) {
         URI uri = call.seed().uri();
         if (!contains(uri)) {
             waiting.put(uri, call);
@@ -64,20 +62,31 @@ final class Dispatcher {
 
     // 从 running 中移除，并根据情况添加至 finished 或 waiting
     synchronized void finished(RealCall call, boolean success) {
-        Scrap scrap = call.seed();
-        URI uri = scrap.uri();
+        Scrap seed = call.seed();
+        URI uri = seed.uri();
         running.remove(uri);
-        if (success || call.count() >= spider.maxRetry()) {
+        if (success) {
             finished.put(uri, call);
             promoteCalls();
-        } else {
+        } else if (call.count() < spider.maxRetry()) {
             enqueue(call);
+        } else {
+            call.incrementCount();
+            finished.put(uri, call);
+            promoteCalls();
         }
+
+//        if (success || call.count() >= spider.maxRetry()) {
+//            finished.put(uri, call);
+//            promoteCalls();
+//        } else {
+//            enqueue(call);
+//        }
         EventListener listener = spider.listener();
         if (success) {
-            listener.onCrawlSuccess(scrap);
+            listener.onSuccess(seed);
         } else {
-            listener.onCrawlFailed(scrap);
+            listener.onFailed(seed);
         }
     }
 
@@ -85,7 +94,7 @@ final class Dispatcher {
         URI uri = scrap.uri();
         waiting.remove(uri);
         handled.add(scrap);
-        spider.listener().onCrawledData(scrap);
+        spider.listener().onHandled(scrap);
     }
 
     private synchronized boolean contains(URI uri) {
@@ -100,11 +109,11 @@ final class Dispatcher {
             for (Call call : scraps) {
                 Scrap scrap = call.seed();
                 all.add(scrap);
-                if (call.count() >= spider.maxRetry()) {
+                if (call.count() > spider.maxRetry()) {
                     failed.add(scrap);
                 }
             }
-            spider.listener().onCrawlFinished(all, failed);
+            spider.listener().onFinished(all, failed, handled);
         }
     }
 }

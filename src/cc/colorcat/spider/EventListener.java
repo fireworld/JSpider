@@ -9,38 +9,38 @@ import java.util.List;
 public interface EventListener {
     EventListener EMPTY_LISTENER = new EventListener() {
         @Override
-        public void onCrawlStart(List<Scrap> seeds) {
+        public void onStart(List<Scrap> seeds) {
 
         }
 
         @Override
-        public void onCrawlSuccess(Scrap scrap) {
+        public void onSuccess(Scrap seed) {
 
         }
 
         @Override
-        public void onCrawlFailed(Scrap scrap) {
+        public void onFailed(Scrap seed) {
 
         }
 
         @Override
-        public void onCrawledData(Scrap data) {
+        public void onHandled(Scrap scrap) {
 
         }
 
         @Override
-        public void onCrawlFinished(List<Scrap> all, List<Scrap> failed) {
+        public void onFinished(List<Scrap> allSeeds, List<Scrap> failedSeeds, List<Scrap> handledScraps) {
 
         }
     };
 
-    void onCrawlStart(List<Scrap> seeds);
+    void onStart(List<Scrap> seeds);
 
-    void onCrawlSuccess(Scrap scrap);
+    void onSuccess(Scrap seed);
 
-    void onCrawlFailed(Scrap scrap);
+    void onFailed(Scrap seed);
 
-    void onCrawledData(Scrap data);
+    void onHandled(Scrap scrap);
 
-    void onCrawlFinished(List<Scrap> all, List<Scrap> failed);
+    void onFinished(List<Scrap> allSeeds, List<Scrap> failedSeeds, List<Scrap> handledScraps);
 }

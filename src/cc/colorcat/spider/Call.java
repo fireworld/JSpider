@@ -10,6 +10,8 @@ public interface Call extends Runnable {
 
     int count();
 
+    void incrementCount();
+
     Scrap seed();
 
     void execute() throws IOException;

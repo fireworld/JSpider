@@ -5,6 +5,10 @@ import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +31,7 @@ public class Main {
 
 
     static {
-        SAVE_DIR = new File("/Users/cxx/Pictures/spider");
+        SAVE_DIR = new File("D:\\temp");
 
         COOKIE_JAR = new CookieJar() {
             private Map<String, List<Cookie>> cookies = new ConcurrentHashMap<>();
@@ -46,13 +50,12 @@ public class Main {
 
         CLIENT = new OkHttpClient.Builder()
                 .cookieJar(COOKIE_JAR)
-                .connectTimeout(3, TimeUnit.SECONDS)
-                .readTimeout(3, TimeUnit.SECONDS)
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(10, TimeUnit.SECONDS)
                 .build();
 
         SPIDER = new JSpider.Builder()
-//                .addParser(new TestPaserNext())
-//                .addParser(new TestParserImage())
+                .addParser(new CoolapkParser())
                 .registerHandler("image", new ImageHandler(new Downloader(CLIENT), SAVE_DIR))
                 .eventListener(new LogListener())
                 .connection(new OkConnection(CLIENT))
@@ -60,9 +63,22 @@ public class Main {
     }
 
     public static void main(String[] args) throws IOException {
+        testJSpider();
+//        testJsoup();
+    }
+
+    private static void testJSpider() {
         Map<String, String> def = new HashMap<>();
-        def.put("dir", "mm");
-//        SPIDER.start(Scrap.newScraps("image", Arrays.asList(url), def));
+        def.put("dir", "testImage");
+        SPIDER.start("image", "https://www.coolapk.com/apk/", def);
+    }
+
+    private static void testJsoup() throws IOException {
+        Document doc = Jsoup.connect("https://www.coolapk.com/apk/").get();
+        Elements elements = doc.select("img[src~=^(http)(s)?://(.)*\\.(jpg|png|jpeg)$]");
+        for (Element element : elements) {
+            System.out.println(element.attr("src"));
+        }
     }
 
     private static class ImageHandler implements Handler {
@@ -102,29 +118,30 @@ public class Main {
 
     private static class LogListener implements EventListener {
         @Override
-        public void onCrawlStart(List<Scrap> seeds) {
-            Log.i("onCrawlStart, seeds = " + seeds.toString());
+        public void onStart(List<Scrap> seeds) {
+//            Log.i("onStart, seeds = " + seeds.toString());
         }
 
         @Override
-        public void onCrawlSuccess(Scrap scrap) {
-            Log.i("onCrawlSuccess, scrap = " + scrap.toString());
+        public void onSuccess(Scrap seed) {
+//            Log.i("onSuccess, seed = " + seed.toString());
         }
 
         @Override
-        public void onCrawlFailed(Scrap scrap) {
-            Log.w("onCrawlFailed, scrap = " + scrap.toString());
+        public void onFailed(Scrap seed) {
+//            Log.w("onFailed, seed = " + seed.toString());
         }
 
         @Override
-        public void onCrawledData(Scrap data) {
-            Log.i("onCrawledData, data = " + data.toString());
+        public void onHandled(Scrap scrap) {
+//            Log.i("onHandled, scrap = " + scrap.toString());
         }
 
         @Override
-        public void onCrawlFinished(List<Scrap> all, List<Scrap> failed) {
-            Log.i("onCrawlFinished, all = " + all.toString());
-            Log.w("onCrawlFinished, failed = " + failed);
+        public void onFinished(List<Scrap> allSeeds, List<Scrap> failedSeeds, List<Scrap> handledScraps) {
+            Log.i("onFinished, all = " + allSeeds.toString());
+            Log.w("onFinished, failed = " + failedSeeds.toString());
+            Log.i("onFinished, handled = " + handledScraps.toString());
         }
     }
 }

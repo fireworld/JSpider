@@ -16,11 +16,11 @@ public class Scrap {
     private final URI uri;
     private Map<String, String> data;
 
-    public static List<Scrap> newScraps(String tag, List<String> uris) {
+    static List<Scrap> newScraps(String tag, List<String> uris) {
         return newScraps(tag, uris, Collections.emptyMap());
     }
 
-    public static List<Scrap> newScraps(String tag, List<String> uris, Map<String, String> defData) {
+    static List<Scrap> newScraps(String tag, List<String> uris, Map<String, String> defData) {
         int size = uris.size();
         List<Scrap> scraps = new ArrayList<>(size);
         for (int i = 0; i < size; ++i) {
@@ -29,19 +29,19 @@ public class Scrap {
         return scraps;
     }
 
-    public static Scrap newScrap(String tag, String uri) {
+    static Scrap newScrap(String tag, String uri) {
         return newScrap(tag, uri, Collections.emptyMap());
     }
 
-    public static Scrap newScrap(String tag, String uri, Map<String, String> defData) {
+    static Scrap newScrap(String tag, String uri, Map<String, String> defData) {
         return newScrap(tag, URI.create(uri), defData);
     }
 
-    public static Scrap newScrap(String tag, URI uri) {
+    static Scrap newScrap(String tag, URI uri) {
         return newScrap(tag, uri, Collections.emptyMap());
     }
 
-    public static Scrap newScrap(String tag, URI uri, Map<String, String> defData) {
+    static Scrap newScrap(String tag, URI uri, Map<String, String> defData) {
         if (Utils.isEmpty(tag)) {
             throw new IllegalArgumentException("tag is empty");
         }

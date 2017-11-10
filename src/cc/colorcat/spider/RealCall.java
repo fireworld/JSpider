@@ -30,6 +30,11 @@ final class RealCall implements Call {
     }
 
     @Override
+    public synchronized void incrementCount() {
+        ++count;
+    }
+
+    @Override
     public Scrap seed() {
         return seed;
     }
@@ -111,11 +116,12 @@ final class RealCall implements Call {
     }
 
     private void breadthCrawl(List<Scrap> scraps) {
-        spider.dispatcher().enqueue(scraps);
+//        spider.dispatcher().enqueue(scraps);
+        spider.mapAndEnqueue(scraps);
     }
 
     private List<Scrap> getScrapsWitInterceptorChain() throws IOException {
-        count++;
+        incrementCount();
         List<Interceptor> users = spider.interceptors();
         List<Interceptor> interceptors = new ArrayList<>(users.size() + 1);
         interceptors.addAll(users);

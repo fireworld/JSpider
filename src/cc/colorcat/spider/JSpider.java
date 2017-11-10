@@ -2,10 +2,7 @@ package cc.colorcat.spider;
 
 import cc.colorcat.spider.internal.Utils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -13,7 +10,7 @@ import java.util.concurrent.Executors;
  * Created by cxx on 17-11-9.
  * xx.ch@outlook.com
  */
-public class JSpider {
+public class JSpider implements Call.Factory {
     private final Map<String, List<Handler>> handlers;
     private final List<Interceptor> interceptors;
     private final List<Parser> parsers;
@@ -78,9 +75,35 @@ public class JSpider {
         return listener;
     }
 
-    public void start(List<Scrap> scraps) {
-        listener.onCrawlStart(scraps);
-        this.dispatcher.enqueue(scraps);
+    public void start(String tag, String uri) {
+        start(tag, uri, Collections.emptyMap());
+    }
+
+    public void start(String tag, String uri, Map<String, String> defaultData) {
+        start(tag, Collections.singletonList(uri), defaultData);
+    }
+
+    public void start(String tag, List<String> uris) {
+        start(tag, uris, Collections.emptyMap());
+    }
+
+    public void start(String tag, List<String> uris, Map<String, String> defaultData) {
+        List<Scrap> scraps = Scrap.newScraps(tag, uris, defaultData);
+        mapAndEnqueue(scraps);
+        listener.onStart(scraps);
+    }
+
+    void mapAndEnqueue(List<Scrap> scraps) {
+        List<Call> calls = new ArrayList<>(scraps.size());
+        for (Scrap scrap : scraps) {
+            calls.add(newCall(scrap));
+        }
+        dispatcher.enqueue(calls);
+    }
+
+    @Override
+    public Call newCall(Scrap seed) {
+        return new RealCall(this, seed);
     }
 
     public static class Builder {
