@@ -3,8 +3,7 @@ package cc.colorcat.spider;
 import cc.colorcat.spider.internal.Utils;
 
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 /**
  * Created by cxx on 17-11-9.
@@ -222,9 +221,16 @@ public class JSpider implements Call.Factory {
                 connection = new OkConnection();
             }
             if (executor == null) {
-                executor = Executors.newCachedThreadPool();
+                executor = defaultService();
             }
             return new JSpider(this);
+        }
+
+        private static ExecutorService defaultService() {
+            ThreadPoolExecutor executor = new ThreadPoolExecutor(8, 10, 60L, TimeUnit.SECONDS,
+                    new LinkedBlockingDeque<>(), new ThreadPoolExecutor.DiscardOldestPolicy());
+            executor.allowCoreThreadTimeOut(true);
+            return executor;
         }
     }
 }
