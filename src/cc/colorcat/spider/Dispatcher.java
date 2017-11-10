@@ -51,7 +51,7 @@ final class Dispatcher {
                 if (running.size() >= spider.maxSeedOnRunning()) break;
             }
         } else if (running.isEmpty()) {
-            logAllFailed();
+            onAllFinished();
         }
     }
 
@@ -68,7 +68,7 @@ final class Dispatcher {
         if (success) {
             finished.put(uri, call);
             promoteCalls();
-        } else if (call.count() < spider.maxRetry()) {
+        } else if (call.count() < spider.maxTry()) {
             enqueue(call);
         } else {
             call.incrementCount();
@@ -76,7 +76,7 @@ final class Dispatcher {
             promoteCalls();
         }
 
-//        if (success || call.count() >= spider.maxRetry()) {
+//        if (success || call.count() >= spider.maxTry()) {
 //            finished.put(uri, call);
 //            promoteCalls();
 //        } else {
@@ -101,7 +101,7 @@ final class Dispatcher {
         return running.containsKey(uri) || waiting.containsKey(uri) || finished.containsKey(uri);
     }
 
-    private void logAllFailed() {
+    private void onAllFinished() {
         synchronized (finished) {
             Collection<Call> scraps = finished.values();
             List<Scrap> all = new ArrayList<>(scraps.size());
@@ -109,7 +109,7 @@ final class Dispatcher {
             for (Call call : scraps) {
                 Scrap scrap = call.seed();
                 all.add(scrap);
-                if (call.count() > spider.maxRetry()) {
+                if (call.count() > spider.maxTry()) {
                     failed.add(scrap);
                 }
             }

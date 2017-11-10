@@ -18,7 +18,7 @@ public class JSpider implements Call.Factory {
     private final ExecutorService executor;
     private final Dispatcher dispatcher;
     private final boolean depthFirst;
-    private final int maxRetry;
+    private final int maxTry;
     private final int maxSeedOnRunning;
     private final EventListener listener;
 
@@ -30,7 +30,7 @@ public class JSpider implements Call.Factory {
         this.executor = builder.executor;
         this.dispatcher = builder.dispatcher != null ? builder.dispatcher : new Dispatcher(this, executor);
         this.depthFirst = builder.depthFirst;
-        this.maxRetry = builder.maxRetry;
+        this.maxTry = builder.maxTry;
         this.maxSeedOnRunning = builder.maxSeedOnRunning;
         this.listener = builder.listener;
     }
@@ -52,7 +52,7 @@ public class JSpider implements Call.Factory {
     }
 
     Connection connection() {
-        return connection;
+        return connection.clone();
     }
 
     Dispatcher dispatcher() {
@@ -63,8 +63,8 @@ public class JSpider implements Call.Factory {
         return depthFirst;
     }
 
-    int maxRetry() {
-        return maxRetry;
+    int maxTry() {
+        return maxTry;
     }
 
     int maxSeedOnRunning() {
@@ -106,6 +106,10 @@ public class JSpider implements Call.Factory {
         return new RealCall(this, seed);
     }
 
+    public Builder newBuilder() {
+        return new Builder(this);
+    }
+
     public static class Builder {
         private Map<String, List<Handler>> handlers;
         private List<Interceptor> interceptors;
@@ -114,7 +118,7 @@ public class JSpider implements Call.Factory {
         private ExecutorService executor;
         private Dispatcher dispatcher;
         private boolean depthFirst = false;
-        private int maxRetry = 3;
+        private int maxTry = 3;
         private int maxSeedOnRunning = 20;
         private EventListener listener;
 
@@ -123,6 +127,18 @@ public class JSpider implements Call.Factory {
             interceptors = new ArrayList<>();
             parsers = new ArrayList<>();
             listener = EventListener.EMPTY_LISTENER;
+        }
+
+        public Builder(JSpider spider) {
+            this.handlers = new HashMap<>(spider.handlers);
+            this.interceptors = new ArrayList<>(spider.interceptors);
+            this.parsers = new ArrayList<>(spider.parsers);
+            this.connection = spider.connection;
+            this.executor = spider.executor;
+            this.dispatcher = spider.dispatcher;
+            this.maxTry = spider.maxTry;
+            this.maxSeedOnRunning = spider.maxSeedOnRunning;
+            this.listener = spider.listener;
         }
 
         public Builder registerHandler(String tag, Handler handler) {
@@ -180,11 +196,11 @@ public class JSpider implements Call.Factory {
             return this;
         }
 
-        public Builder maxRetry(int maxRetry) {
+        public Builder maxTry(int maxRetry) {
             if (maxRetry < 1) {
-                throw new IllegalArgumentException("maxRetry < 1");
+                throw new IllegalArgumentException("maxTry < 1");
             }
-            this.maxRetry = maxRetry;
+            this.maxTry = maxRetry;
             return this;
         }
 

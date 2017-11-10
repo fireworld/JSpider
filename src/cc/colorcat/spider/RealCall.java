@@ -21,7 +21,7 @@ final class RealCall implements Call {
     RealCall(JSpider spider, Scrap seed) {
         this.spider = spider;
         this.seed = seed;
-        this.connection = spider.connection().clone();
+        this.connection = spider.connection();
     }
 
     @Override
