@@ -97,19 +97,19 @@ public class Main {
             Map<String, String> data = scrap.data();
             String url = data.get("url");
             if (url != null && url.matches("^(http)(s)?://(.)*\\.(jpg|png|jpeg)$")) {
-                String name = url.substring(url.lastIndexOf('/'), url.length());
-                System.out.println("handle url = " + url);
-//                String dirS = data.get("dir");
-//                File savePath = directory;
-//                if (!Utils.isEmpty(dirS)) {
-//                    savePath = new File(savePath, dirS);
-//                }
-//                savePath = new File(savePath, name);
-//                int count = 1;
-//                while (savePath.exists()) {
-//                    savePath = new File(directory, count + "_" + name);
-//                }
-//                downloader.submit(url, savePath);
+                String name = url.substring(url.lastIndexOf('/') + 1, url.length());
+                String dirS = data.get("dir");
+                File folder = directory;
+                if (!Utils.isEmpty(dirS)) {
+                    folder = new File(folder, dirS);
+                }
+                File savePath = new File(folder, name);
+                int count = 1;
+                while (savePath.exists()) {
+                    savePath = new File(folder, count + "_" + name);
+                    count++;
+                }
+                downloader.submit(url, savePath);
                 return true;
             }
             return false;

@@ -100,23 +100,21 @@ final class Dispatcher {
         spider.listener().onHandled(scrap);
     }
 
-    private synchronized boolean contains(URI uri) {
+    private boolean contains(URI uri) {
         return running.containsKey(uri) || waiting.containsKey(uri) || finished.containsKey(uri);
     }
 
     private void onAllFinished() {
-        synchronized (finished) {
-            Collection<Call> scraps = finished.values();
-            List<Scrap> all = new ArrayList<>(scraps.size());
-            List<Scrap> failed = new ArrayList<>();
-            for (Call call : scraps) {
-                Scrap scrap = call.seed();
-                all.add(scrap);
-                if (call.count() > spider.maxTry()) {
-                    failed.add(scrap);
-                }
+        Collection<Call> scraps = finished.values();
+        List<Scrap> all = new ArrayList<>(scraps.size());
+        List<Scrap> failed = new ArrayList<>();
+        for (Call call : scraps) {
+            Scrap scrap = call.seed();
+            all.add(scrap);
+            if (call.count() > spider.maxTry()) {
+                failed.add(scrap);
             }
-            spider.listener().onFinished(all, failed, handled);
         }
+        spider.listener().onFinished(all, failed, handled);
     }
 }

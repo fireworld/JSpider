@@ -39,6 +39,7 @@ public class Downloader {
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     write(response, savePath);
+                    Log.w("Download success, url = " + call.request().url());
                 }
             });
         }
