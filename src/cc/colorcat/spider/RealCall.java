@@ -82,9 +82,9 @@ final class RealCall implements Call {
     }
 
     private List<Scrap> tryHandle(List<Scrap> scraps) {
-        Iterator<Scrap> iterable = scraps.iterator();
-        while (iterable.hasNext()) {
-            Scrap scrap = iterable.next();
+        Iterator<Scrap> iterator = scraps.iterator();
+        while (iterator.hasNext()) {
+            Scrap scrap = iterator.next();
             if (scrap.data().isEmpty()) continue;
             boolean handled = false;
             List<Handler> handlers = spider.handlers(scrap.tag());
@@ -94,7 +94,7 @@ final class RealCall implements Call {
                 }
             }
             if (handled) {
-                iterable.remove();
+                iterator.remove();
                 spider.dispatcher().handled(scrap);
             }
         }
