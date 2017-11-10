@@ -63,8 +63,9 @@ public class Main {
     }
 
     public static void main(String[] args) throws IOException {
-        testJSpider();
+//        testJSpider();
 //        testJsoup();
+        testDownload("https://bing.ioliu.cn//photo/FreshSalt_ZH-CN12818759319?force=download");
     }
 
     private static void testJSpider() {
@@ -79,6 +80,11 @@ public class Main {
         for (Element element : elements) {
             System.out.println(element.attr("src"));
         }
+    }
+
+    private static void testDownload(String url) throws IOException {
+        File path = new File(SAVE_DIR, System.currentTimeMillis() + ".jpg");
+        new Downloader(CLIENT).download(url, path);
     }
 
     private static class ImageHandler implements Handler {
@@ -99,34 +105,10 @@ public class Main {
             if (url != null && url.matches("^(http)(s)?://(.)*\\.(jpg|png|jpeg)$")) {
                 String fileName = url.substring(url.lastIndexOf('/') + 1, url.length());
                 String folderName = data.get("dir");
-                downloader.submit(url, makePath(folderName, fileName));
+                downloader.submit(url, Utils.createSavePath(directory, folderName, fileName));
                 return true;
             }
             return false;
-        }
-
-        private File makePath(String folderName, String fileName) {
-            File folder = directory;
-            if (folderName != null && !folderName.isEmpty()) {
-                folder = new File(folder, folderName);
-            }
-            if (folder.exists() || folder.mkdirs()) {
-                String baseName, extName;
-                int dot = fileName.lastIndexOf('.');
-                if (dot != -1) {
-                    baseName = fileName.substring(0, dot);
-                    extName = fileName.substring(dot, fileName.length());
-                } else {
-                    baseName = fileName;
-                    extName = "";
-                }
-                File savePath = new File(folder, baseName + extName);
-                for (int i = 0; savePath.exists(); i++) {
-                    savePath = new File(folder, baseName + "_" + i + extName);
-                }
-                return savePath;
-            }
-            throw new RuntimeException("create directory failed, path = " + folder.toString());
         }
     }
 

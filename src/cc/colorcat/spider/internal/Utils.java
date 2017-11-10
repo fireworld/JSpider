@@ -1,6 +1,7 @@
 package cc.colorcat.spider.internal;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
@@ -13,6 +14,30 @@ import java.util.*;
 public final class Utils {
     public static final Charset UTF8 = Charset.forName("UTF-8");
     private static final String REG_HTTP_URL = "^(http)(s)?://(.)+";
+
+    public static File createSavePath(File directory, String folderName, String fileName) {
+        File folder = directory;
+        if (folderName != null && !folderName.isEmpty()) {
+            folder = new File(folder, folderName);
+        }
+        if (folder.exists() || folder.mkdirs()) {
+            String baseName, extName;
+            int dot = fileName.lastIndexOf('.');
+            if (dot != -1) {
+                baseName = fileName.substring(0, dot);
+                extName = fileName.substring(dot, fileName.length());
+            } else {
+                baseName = fileName;
+                extName = "";
+            }
+            File savePath = new File(folder, baseName + extName);
+            for (int i = 0; savePath.exists(); i++) {
+                savePath = new File(folder, baseName + "_" + i + extName);
+            }
+            return savePath;
+        }
+        throw new RuntimeException("create directory failed, path = " + folder.toString());
+    }
 
     public static <K, V> Map<K, V> immutableMap(Map<K, V> map) {
         if (map == null || map.isEmpty()) {
