@@ -165,6 +165,7 @@ public class Scrap {
         return "Scrap{" +
                 "tag='" + tag + '\'' +
                 ", uri=" + uri +
+                ", depth=" + depth +
                 ", data=" + data +
                 '}';
     }
