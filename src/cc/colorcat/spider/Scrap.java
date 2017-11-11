@@ -14,6 +14,7 @@ import java.util.*;
 public class Scrap {
     private final String tag;
     private final URI uri;
+    private final int depth;
     private Map<String, String> data;
 
     static List<Scrap> newScraps(String tag, List<String> uris) {
@@ -55,9 +56,18 @@ public class Scrap {
     }
 
     private Scrap(String tag, URI uri, Map<String, String> data) {
-        this.uri = uri;
+        this(tag, uri, 0, data);
+    }
+
+    private Scrap(String tag, URI uri, int depth, Map<String, String> data) {
         this.tag = tag;
+        this.uri = uri;
+        this.depth = depth;
         this.data = data;
+    }
+
+    public String tag() {
+        return this.tag;
     }
 
     public URI uri() {
@@ -72,12 +82,12 @@ public class Scrap {
         }
     }
 
-    public String tag() {
-        return this.tag;
-    }
-
     public Map<String, String> data() {
         return Utils.immutableMap(data);
+    }
+
+    public int depth() {
+        return depth;
     }
 
     public Scrap fill(Map<String, String> data) {
@@ -117,14 +127,14 @@ public class Scrap {
         if (key == null || value == null) {
             throw new NullPointerException("key or value is null");
         }
-        return new Scrap(tag, uri, new HashMap<>(data)).fill(key, value);
+        return new Scrap(tag, uri, depth + 1, new HashMap<>(data)).fill(key, value);
     }
 
     public Scrap newScrapWithFill(Map<String, String> data) {
         if (data == null) {
             throw new NullPointerException("data == null");
         }
-        return new Scrap(tag, uri, new HashMap<>(this.data)).fill(data);
+        return new Scrap(tag, uri, depth + 1, new HashMap<>(this.data)).fill(data);
     }
 
     public Scrap newScrap(String uri) {
@@ -135,7 +145,7 @@ public class Scrap {
         if (uri == null) {
             throw new NullPointerException("uri == null");
         }
-        return new Scrap(tag, uri, new HashMap<>(data));
+        return new Scrap(tag, uri, depth + 1, new HashMap<>(data));
     }
 
     public Scrap newScrapWithJoin(String uri) {
@@ -147,7 +157,7 @@ public class Scrap {
             throw new NullPointerException("uri == null");
         }
         URI newUri = this.uri.resolve(uri);
-        return new Scrap(tag, newUri, new HashMap<>(data));
+        return new Scrap(tag, newUri, depth + 1, new HashMap<>(data));
     }
 
     @Override
