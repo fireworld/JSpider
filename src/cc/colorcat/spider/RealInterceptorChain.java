@@ -12,17 +12,24 @@ final class RealInterceptorChain implements Interceptor.Chain {
     private final int index;
     private final Scrap seed;
     private final Connection connection;
+    private final Parser parser;
 
-    public RealInterceptorChain(List<Interceptor> interceptors, int index, Scrap seed, Connection connection) {
+    RealInterceptorChain(List<Interceptor> interceptors, int index, Scrap seed, Connection connection, Parser parser) {
         this.interceptors = interceptors;
         this.index = index;
         this.seed = seed;
         this.connection = connection;
+        this.parser = parser;
     }
 
     @Override
     public Connection connection() {
         return connection;
+    }
+
+    @Override
+    public Parser parser() {
+        return parser;
     }
 
     @Override
@@ -32,7 +39,7 @@ final class RealInterceptorChain implements Interceptor.Chain {
 
     @Override
     public List<Scrap> proceed(Scrap seed) throws IOException {
-        RealInterceptorChain next = new RealInterceptorChain(interceptors, index + 1, seed, connection);
+        RealInterceptorChain next = new RealInterceptorChain(interceptors, index + 1, seed, connection, parser);
         Interceptor interceptor = interceptors.get(index);
         return interceptor.intercept(next);
     }

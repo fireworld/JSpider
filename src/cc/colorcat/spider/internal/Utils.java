@@ -1,8 +1,6 @@
 package cc.colorcat.spider.internal;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -81,12 +79,42 @@ public final class Utils {
         }
     }
 
+    public static Charset parseCharset(String contentType) {
+        if (contentType != null) {
+            String[] params = contentType.split(";");
+            final int length = params.length;
+            for (int i = 1; i < length; i++) {
+                String[] pair = params[i].trim().split("=");
+                if (pair.length == 2) {
+                    if (pair[0].equalsIgnoreCase("charset")) {
+                        try {
+                            return Charset.forName(pair[1]);
+                        } catch (Exception ignore) {
+                            return null;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     public static <T> T nullElse(T value, T other) {
         return value != null ? value : other;
     }
 
     public static boolean isEmpty(CharSequence text) {
         return text == null || text.length() == 0;
+    }
+
+    public static String toString(InputStream is, Charset charset) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        BufferedReader br = new BufferedReader(new InputStreamReader(is, charset));
+        char[] buffer = new char[1024];
+        for (int length = br.read(buffer); length != -1; length = br.read(buffer)) {
+            sb.append(buffer, 0, length);
+        }
+        return sb.toString();
     }
 
     public static void close(Closeable closeable) {

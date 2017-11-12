@@ -11,7 +11,10 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -63,9 +66,13 @@ public class Main {
     }
 
     public static void main(String[] args) throws IOException {
+        String path = "/Users/cxx/Workspace/AsProjects/NetBird2/netbird2/src/main/java/cc/colorcat/netbird2/BitmapParser.java";
+        InputStream is = new FileInputStream(path);
+        String s = Utils.toString(is, Utils.UTF8);
+        System.out.println(s);
 //        testJSpider();
 //        testJsoup();
-        testDownload("https://bing.ioliu.cn//photo/FreshSalt_ZH-CN12818759319?force=download");
+//        testDownload("https://bing.ioliu.cn//photo/FreshSalt_ZH-CN12818759319?force=download");
     }
 
     private static void testJSpider() {

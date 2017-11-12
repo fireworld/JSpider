@@ -11,7 +11,7 @@ import java.util.*;
  * Created by cxx on 17-11-9.
  * xx.ch@outlook.com
  */
-public class Scrap {
+public final class Scrap {
     private final String tag;
     private final URI uri;
     private final int depth;
@@ -92,7 +92,9 @@ public class Scrap {
 
     public Scrap fill(Map<String, String> data) {
         if (data != null) {
-            this.data.putAll(data);
+            for (Map.Entry<String, String> entry : data.entrySet()) {
+                fill(entry.getKey(), entry.getValue());
+            }
         }
         return this;
     }
@@ -100,10 +102,7 @@ public class Scrap {
     public Scrap fillIfAbsent(Map<String, String> data) {
         if (data != null) {
             for (Map.Entry<String, String> entry : data.entrySet()) {
-                String key = entry.getKey();
-                if (!this.data.containsKey(key)) {
-                    this.data.put(key, entry.getValue());
-                }
+                fillIfAbsent(entry.getKey(), entry.getValue());
             }
         }
         return this;

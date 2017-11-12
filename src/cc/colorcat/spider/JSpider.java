@@ -218,7 +218,7 @@ public class JSpider implements Call.Factory {
 
         public JSpider build() {
             if (connection == null) {
-                connection = new OkConnection();
+                connection = new HttpConnection();
             }
             if (executor == null) {
                 executor = defaultService();

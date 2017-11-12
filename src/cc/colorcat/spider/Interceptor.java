@@ -14,6 +14,8 @@ public interface Interceptor {
     interface Chain {
         Connection connection();
 
+        Parser parser();
+
         Scrap seed();
 
         List<Scrap> proceed(Scrap seed) throws IOException;

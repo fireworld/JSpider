@@ -60,7 +60,7 @@ public final class WebSnapshot {
         return this.charset;
     }
 
-    public boolean isSuccess() {
+    boolean isSuccess() {
         return !Utils.isEmpty(resource);
     }
 

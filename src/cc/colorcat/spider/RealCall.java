@@ -16,12 +16,14 @@ final class RealCall implements Call {
     private final JSpider spider;
     private final Scrap seed;
     private final Connection connection;
+    private final Parser parser;
     private int count = 0;
 
     RealCall(JSpider spider, Scrap seed) {
         this.spider = spider;
         this.seed = seed;
         this.connection = spider.connection();
+        this.parser = new ParserProxy(spider.parsers());
     }
 
     @Override
@@ -125,8 +127,8 @@ final class RealCall implements Call {
         List<Interceptor> users = spider.interceptors();
         List<Interceptor> interceptors = new ArrayList<>(users.size() + 1);
         interceptors.addAll(users);
-        interceptors.add(new ParserInterceptor(spider.parsers()));
-        Interceptor.Chain chain = new RealInterceptorChain(interceptors, 0, seed, connection);
+        interceptors.add(new ConnectionInterceptor());
+        Interceptor.Chain chain = new RealInterceptorChain(interceptors, 0, seed, connection, parser);
         return chain.proceed(seed);
     }
 }
