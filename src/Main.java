@@ -1,5 +1,4 @@
 import cc.colorcat.spider.*;
-import cc.colorcat.spider.internal.Log;
 import cc.colorcat.spider.internal.Utils;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
@@ -14,7 +13,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -66,7 +64,7 @@ public class Main {
     }
 
     public static void main(String[] args) throws IOException {
-        String path = "/Users/cxx/Workspace/AsProjects/NetBird2/netbird2/src/main/java/cc/colorcat/netbird2/BitmapParser.java";
+        String path = "D:\\Workspace\\IdeaProjects\\JSpider\\src\\CoolapkParser.java";
         InputStream is = new FileInputStream(path);
         String s = Utils.toString(is, Utils.UTF8);
         System.out.println(s);
@@ -121,17 +119,17 @@ public class Main {
 
     private static class LogListener implements EventListener {
         @Override
-        public void onStart(List<Scrap> seeds) {
+        public void onStart(List<Seed> seeds) {
 //            Log.i("onStart, seeds = " + seeds.toString());
         }
 
         @Override
-        public void onSuccess(Scrap seed) {
+        public void onSuccess(Seed seed) {
 //            Log.i("onSuccess, seed = " + seed.toString());
         }
 
         @Override
-        public void onFailed(Scrap seed) {
+        public void onFailed(Seed seed, Exception reason) {
 //            Log.w("onFailed, seed = " + seed.toString());
         }
 
@@ -141,15 +139,20 @@ public class Main {
         }
 
         @Override
-        public void onFinished(List<Scrap> allSeeds, List<Scrap> failedSeeds, List<Scrap> handledScraps) {
+        public void onReachedMaxDepth(Seed seed) {
+
+        }
+
+        @Override
+        public void onFinished(List<Seed> allSeeds, List<Seed> failedSeeds, List<Scrap> handledScraps) {
             Log("AllSeeds", allSeeds);
             Log("failedSeeds", failedSeeds);
             Log("handledScraps", handledScraps);
         }
 
-        private static void Log(String tag, List<Scrap> scraps) {
+        private static void Log(String tag, List<? extends Seed> scraps) {
             System.out.println("------------------------------- " + tag + " -------------------------------");
-            for (Scrap scrap : scraps) {
+            for (Seed scrap : scraps) {
                 System.out.println(scrap);
             }
             System.out.println("----------------------------------------------------------------------");

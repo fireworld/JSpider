@@ -16,8 +16,8 @@ public interface Interceptor {
 
         Parser parser();
 
-        Scrap seed();
+        Seed seed();
 
-        List<Scrap> proceed(Scrap seed) throws IOException;
+        List<Scrap> proceed(Seed seed) throws IOException;
     }
 }

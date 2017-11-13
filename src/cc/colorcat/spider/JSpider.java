@@ -10,27 +10,31 @@ import java.util.concurrent.*;
  * xx.ch@outlook.com
  */
 public class JSpider implements Call.Factory {
-    private final Map<String, List<Handler>> handlers;
+    final Map<String, List<Handler>> handlers;
     private final List<Interceptor> interceptors;
     private final List<Parser> parsers;
+    final ParserProxy parserProxy;
     private final Connection connection;
     private final ExecutorService executor;
     private final Dispatcher dispatcher;
     private final boolean depthFirst;
     private final int maxTry;
     private final int maxSeedOnRunning;
+    private final int maxDepth;
     private final EventListener listener;
 
     private JSpider(Builder builder) {
         this.handlers = Utils.immutableMap(builder.handlers);
         this.interceptors = Utils.immutableList(builder.interceptors);
         this.parsers = Utils.immutableList(builder.parsers);
+        this.parserProxy = new ParserProxy(this.parsers);
         this.connection = builder.connection;
         this.executor = builder.executor;
         this.dispatcher = builder.dispatcher != null ? builder.dispatcher : new Dispatcher(this, executor);
         this.depthFirst = builder.depthFirst;
         this.maxTry = builder.maxTry;
         this.maxSeedOnRunning = builder.maxSeedOnRunning;
+        this.maxDepth = builder.maxDepth;
         this.listener = builder.listener;
     }
 
@@ -70,6 +74,10 @@ public class JSpider implements Call.Factory {
         return maxSeedOnRunning;
     }
 
+    int maxDepth() {
+        return maxDepth;
+    }
+
     EventListener listener() {
         return listener;
     }
@@ -87,21 +95,21 @@ public class JSpider implements Call.Factory {
     }
 
     public void start(String tag, List<String> uris, Map<String, String> defaultData) {
-        List<Scrap> scraps = Scrap.newScraps(tag, uris, defaultData);
-        mapAndEnqueue(scraps);
-        listener.onStart(scraps);
+        List<Seed> seeds = Seed.newSeeds(tag, uris, defaultData);
+        mapAndEnqueue(seeds);
+        listener.onStart(seeds);
     }
 
-    void mapAndEnqueue(List<Scrap> scraps) {
-        List<Call> calls = new ArrayList<>(scraps.size());
-        for (Scrap scrap : scraps) {
-            calls.add(newCall(scrap));
+    void mapAndEnqueue(List<? extends Seed> seeds) {
+        List<Call> calls = new ArrayList<>(seeds.size());
+        for (Seed seed : seeds) {
+            calls.add(newCall(seed));
         }
         dispatcher.enqueue(calls);
     }
 
     @Override
-    public Call newCall(Scrap seed) {
+    public Call newCall(Seed seed) {
         return new RealCall(this, seed);
     }
 
@@ -119,6 +127,7 @@ public class JSpider implements Call.Factory {
         private boolean depthFirst = false;
         private int maxTry = 3;
         private int maxSeedOnRunning = 20;
+        private int maxDepth = 100;
         private EventListener listener;
 
         public Builder() {
@@ -137,6 +146,7 @@ public class JSpider implements Call.Factory {
             this.dispatcher = spider.dispatcher;
             this.maxTry = spider.maxTry;
             this.maxSeedOnRunning = spider.maxSeedOnRunning;
+            this.maxDepth = spider.maxDepth;
             this.listener = spider.listener;
         }
 
@@ -208,6 +218,14 @@ public class JSpider implements Call.Factory {
                 throw new IllegalArgumentException("maxSeedOnRunning < 1");
             }
             this.maxSeedOnRunning = maxSeedOnRunning;
+            return this;
+        }
+
+        public Builder maxDepth(int maxDepth) {
+            if (maxDepth < 1) {
+                throw new IllegalArgumentException("maxDepth < 1");
+            }
+            this.maxDepth = maxDepth;
             return this;
         }
 

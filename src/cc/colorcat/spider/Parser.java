@@ -13,5 +13,5 @@ public interface Parser {
      *
      * @return {@link List<Scrap>} if success else empty list.
      */
-    List<Scrap> parse(Scrap seed, WebSnapshot snapshot);
+    List<Scrap> parse(Seed seed, WebSnapshot snapshot);
 }

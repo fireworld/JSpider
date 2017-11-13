@@ -14,7 +14,7 @@ class ConnectionInterceptor implements Interceptor {
 
     @Override
     public List<Scrap> intercept(Chain chain) throws IOException {
-        Scrap seed = chain.seed();
+        Seed seed = chain.seed();
         WebSnapshot snapshot = chain.connection().get(seed.uri());
         return chain.parser().parse(seed, snapshot);
     }

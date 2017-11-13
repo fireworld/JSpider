@@ -10,11 +10,11 @@ import java.util.List;
 final class RealInterceptorChain implements Interceptor.Chain {
     private final List<Interceptor> interceptors;
     private final int index;
-    private final Scrap seed;
+    private final Seed seed;
     private final Connection connection;
     private final Parser parser;
 
-    RealInterceptorChain(List<Interceptor> interceptors, int index, Scrap seed, Connection connection, Parser parser) {
+    RealInterceptorChain(List<Interceptor> interceptors, int index, Seed seed, Connection connection, Parser parser) {
         this.interceptors = interceptors;
         this.index = index;
         this.seed = seed;
@@ -33,12 +33,12 @@ final class RealInterceptorChain implements Interceptor.Chain {
     }
 
     @Override
-    public Scrap seed() {
+    public Seed seed() {
         return seed;
     }
 
     @Override
-    public List<Scrap> proceed(Scrap seed) throws IOException {
+    public List<Scrap> proceed(Seed seed) throws IOException {
         RealInterceptorChain next = new RealInterceptorChain(interceptors, index + 1, seed, connection, parser);
         Interceptor interceptor = interceptors.get(index);
         return interceptor.intercept(next);

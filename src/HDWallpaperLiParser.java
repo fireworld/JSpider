@@ -1,5 +1,6 @@
 import cc.colorcat.spider.Parser;
 import cc.colorcat.spider.Scrap;
+import cc.colorcat.spider.Seed;
 import cc.colorcat.spider.WebSnapshot;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -19,7 +20,7 @@ public class HDWallpaperLiParser implements Parser {
     public static final String TAG = "image";
 
     @Override
-    public List<Scrap> parse(Scrap seed, WebSnapshot snapshot) {
+    public List<Scrap> parse(Seed seed, WebSnapshot snapshot) {
         if (!TAG.equals(seed.tag()) || !seed.uri().toString().contains(HOST)) {
             return Collections.emptyList();
         }

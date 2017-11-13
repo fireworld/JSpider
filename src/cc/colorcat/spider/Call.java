@@ -1,7 +1,5 @@
 package cc.colorcat.spider;
 
-import java.io.IOException;
-
 /**
  * Created by cxx on 17-11-9.
  * xx.ch@outlook.com
@@ -12,12 +10,12 @@ public interface Call extends Runnable {
 
     void incrementCount();
 
-    Scrap seed();
+    Seed seed();
 
-    void execute() throws IOException;
+    void execute();
 
     interface Factory {
 
-        Call newCall(Scrap seed);
+        Call newCall(Seed seed);
     }
 }

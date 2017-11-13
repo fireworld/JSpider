@@ -14,6 +14,7 @@ final class Dispatcher {
     private final JSpider spider;
     private final ExecutorService executor;
     private final List<Scrap> handled = new LinkedList<>();
+    private final List<Seed> reachedMaxDepth = new LinkedList<>();
     private final LinkedHashMap<URI, Call> finished = new LinkedHashMap<>();
     private final LinkedHashMap<URI, Call> waiting = new LinkedHashMap<>();
     private final LinkedHashMap<URI, Call> running = new LinkedHashMap<>();
@@ -63,11 +64,11 @@ final class Dispatcher {
     }
 
     // 从 running 中移除，并根据情况添加至 finished 或 waiting
-    synchronized void finished(RealCall call, boolean success) {
-        Scrap seed = call.seed();
+    synchronized void finished(RealCall call, Exception reason) {
+        Seed seed = call.seed();
         URI uri = seed.uri();
         running.remove(uri);
-        if (success) {
+        if (reason == null) {
             finished.put(uri, call);
             promoteCalls();
         } else if (call.count() < spider.maxTry()) {
@@ -86,35 +87,40 @@ final class Dispatcher {
 //            enqueue(call);
 //        }
         EventListener listener = spider.listener();
-        if (success) {
+        if (reason == null) {
             listener.onSuccess(seed);
         } else {
-            listener.onFailed(seed);
+            listener.onFailed(seed, reason);
         }
     }
 
     synchronized void handled(Scrap scrap) {
         URI uri = scrap.uri();
-        waiting.remove(uri);
+        assert waiting.remove(uri) == null; // todo 这儿是不需要的，暂时加在这儿测试。
         handled.add(scrap);
         spider.listener().onHandled(scrap);
     }
 
-    private boolean contains(URI uri) {
-        return running.containsKey(uri) || waiting.containsKey(uri) || finished.containsKey(uri);
+    synchronized void onReachedMaxDepth(Seed seed) {
+        reachedMaxDepth.add(seed);
+        spider.listener().onReachedMaxDepth(seed);
     }
 
     private void onAllFinished() {
         Collection<Call> scraps = finished.values();
-        List<Scrap> all = new ArrayList<>(scraps.size());
-        List<Scrap> failed = new ArrayList<>();
+        List<Seed> all = new ArrayList<>(scraps.size());
+        List<Seed> failed = new ArrayList<>();
         for (Call call : scraps) {
-            Scrap scrap = call.seed();
+            Seed scrap = call.seed();
             all.add(scrap);
             if (call.count() > spider.maxTry()) {
                 failed.add(scrap);
             }
         }
         spider.listener().onFinished(all, failed, handled);
+    }
+
+    private boolean contains(URI uri) {
+        return running.containsKey(uri) || waiting.containsKey(uri) || finished.containsKey(uri);
     }
 }

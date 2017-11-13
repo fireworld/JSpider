@@ -8,14 +8,14 @@ import java.util.List;
  * xx.ch@outlook.com
  */
 final class ParserProxy implements Parser {
-    private List<Parser> parsers;
+    private final List<Parser> parsers;
 
     ParserProxy(List<Parser> parsers) {
         this.parsers = parsers;
     }
 
     @Override
-    public List<Scrap> parse(Scrap seed, WebSnapshot snapshot) {
+    public List<Scrap> parse(Seed seed, WebSnapshot snapshot) {
         List<Scrap> result = new LinkedList<>();
         if (snapshot != null && snapshot.isSuccess()) {
             for (int i = 0, size = parsers.size(); i < size; ++i) {

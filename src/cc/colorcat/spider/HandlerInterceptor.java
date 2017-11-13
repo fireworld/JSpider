@@ -13,10 +13,10 @@ import java.util.Map;
  * xx.ch@outlook.com
  */
 final class HandlerInterceptor implements Interceptor {
-    private final Map<String, List<Handler>> handlers;
+    private final JSpider spider;
 
-    HandlerInterceptor(Map<String, List<Handler>> handlers) {
-        this.handlers = handlers;
+    HandlerInterceptor(JSpider spider) {
+        this.spider = spider;
     }
 
     @Override
@@ -34,13 +34,13 @@ final class HandlerInterceptor implements Interceptor {
             }
             if (handled) {
                 iterator.remove();
-                // todo
+                spider.dispatcher().handled(scrap);
             }
         }
         return scraps;
     }
 
     private List<Handler> handlers(Scrap scrap) {
-        return Utils.nullElse(handlers.get(scrap.tag()), Collections.emptyList());
+        return Utils.nullElse(spider.handlers.get(scrap.tag()), Collections.emptyList());
     }
 }

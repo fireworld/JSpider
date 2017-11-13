@@ -4,7 +4,6 @@ import cc.colorcat.spider.internal.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,16 +13,16 @@ import java.util.List;
  */
 final class RealCall implements Call {
     private final JSpider spider;
-    private final Scrap seed;
+    private final Seed seed;
     private final Connection connection;
     private final Parser parser;
     private int count = 0;
 
-    RealCall(JSpider spider, Scrap seed) {
+    RealCall(JSpider spider, Seed seed) {
         this.spider = spider;
         this.seed = seed;
         this.connection = spider.connection();
-        this.parser = new ParserProxy(spider.parsers());
+        this.parser = spider.parserProxy;
     }
 
     @Override
@@ -37,89 +36,48 @@ final class RealCall implements Call {
     }
 
     @Override
-    public Scrap seed() {
+    public Seed seed() {
         return seed;
     }
 
     @Override
-    public void execute() throws IOException {
-        boolean success = false;
+    public void execute() {
+        Exception reason = null;
         try {
-            List<Scrap> newScraps = getScrapsWitInterceptorChain();
-            success = true; // reach her is success
-            List<Scrap> unhandled = tryHandle(newScraps);
-            if (!unhandled.isEmpty()) {
+            List<? extends Seed> newSeeds = getScrapsWitInterceptorChain();
+            if (!newSeeds.isEmpty()) {
                 if (spider.depthFirst()) {
-                    depthCrawl(unhandled, false);
+                    depthCrawl(newSeeds);
                 } else {
-                    breadthCrawl(unhandled);
+                    breadthCrawl(newSeeds);
                 }
             }
+        } catch (Exception e) {
+            reason = e;
+            Log.e(e);
         } finally {
-            spider.dispatcher().finished(this, success);
+            spider.dispatcher().finished(this, reason);
         }
     }
 
     @Override
     public void run() {
-        synchronized (seed) {
-            boolean success = false;
-            try {
-                List<Scrap> newScraps = getScrapsWitInterceptorChain();
-                success = true; // reach her is success
-                List<Scrap> unhandled = tryHandle(newScraps);
-                if (!unhandled.isEmpty()) {
-                    if (spider.depthFirst()) {
-                        depthCrawl(unhandled, true);
-                    } else {
-                        breadthCrawl(unhandled);
-                    }
-                }
-            } catch (IOException e) {
-                Log.e(e);
-            } finally {
-                spider.dispatcher().finished(this, success);
-            }
-        }
+        execute();
     }
 
-    private List<Scrap> tryHandle(List<Scrap> scraps) {
-        Iterator<Scrap> iterator = scraps.iterator();
-        while (iterator.hasNext()) {
-            Scrap scrap = iterator.next();
-            if (scrap.data().isEmpty()) continue;
-            boolean handled = false;
-            List<Handler> handlers = spider.handlers(scrap.tag());
-            for (Handler handler : handlers) {
-                if (handler.handle(scrap)) {
-                    handled = true;
-                }
-            }
-            if (handled) {
-                iterator.remove();
-                spider.dispatcher().handled(scrap);
-            }
-        }
-        return scraps;
-    }
-
-    private void depthCrawl(List<Scrap> scraps, boolean onRun) throws IOException {
-        LinkedList<Scrap> newScraps = new LinkedList<>(scraps);
-        for (Scrap scrap = newScraps.pollFirst(); scrap != null; scrap = newScraps.pollFirst()) {
-            RealCall call = new RealCall(spider, scrap);
+    private void depthCrawl(List<? extends Seed> seeds) throws IOException {
+        LinkedList<? extends Seed> newSeeds = new LinkedList<>(seeds);
+        for (Seed seed = newSeeds.pollFirst(); seed != null; seed = newSeeds.pollFirst()) {
+            RealCall call = new RealCall(spider, seed);
             if (spider.dispatcher().tryEnqueueRunning(call)) {
-                if (onRun) {
-                    call.run();
-                } else {
-                    call.execute();
-                }
+                call.execute();
             }
         }
     }
 
-    private void breadthCrawl(List<Scrap> scraps) {
+    private void breadthCrawl(List<? extends Seed> seeds) {
 //        spider.dispatcher().enqueue(scraps);
-        spider.mapAndEnqueue(scraps);
+        spider.mapAndEnqueue(seeds);
     }
 
     private List<Scrap> getScrapsWitInterceptorChain() throws IOException {

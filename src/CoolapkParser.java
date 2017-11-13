@@ -1,5 +1,6 @@
 import cc.colorcat.spider.Parser;
 import cc.colorcat.spider.Scrap;
+import cc.colorcat.spider.Seed;
 import cc.colorcat.spider.WebSnapshot;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -12,7 +13,7 @@ import java.util.List;
 
 public class CoolapkParser implements Parser {
     @Override
-    public List<Scrap> parse(Scrap seed, WebSnapshot snapshot) {
+    public List<Scrap> parse(Seed seed, WebSnapshot snapshot) {
         String baseUrl = seed.baseUrl();
         System.out.println("baseUrl --> " + baseUrl);
         if (!seed.tag().equals("image")) return Collections.emptyList();
