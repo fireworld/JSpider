@@ -3,7 +3,10 @@ package cc.colorcat.spider;
 import cc.colorcat.spider.internal.Utils;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by cxx on 17-11-9.
@@ -111,7 +114,7 @@ public class JSpider implements Call.Factory {
         for (Seed seed : seeds) {
             calls.add(newCall(seed));
         }
-        dispatcher.enqueue(calls);
+        dispatcher.enqueue(calls, depthFirst);
     }
 
     @Override

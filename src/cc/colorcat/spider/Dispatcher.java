@@ -1,7 +1,5 @@
 package cc.colorcat.spider;
 
-import cc.colorcat.spider.internal.Log;
-
 import java.net.URI;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -15,40 +13,40 @@ final class Dispatcher {
     private final ExecutorService executor;
     //    private final List<Scrap> handled = new LinkedList<>();
     private final List<Seed> reachedMaxDepth = new LinkedList<>();
-    private final LinkedHashMap<URI, Call> finished = new LinkedHashMap<>();
-    private final LinkedHashMap<URI, Call> waiting = new LinkedHashMap<>();
-    private final LinkedHashMap<URI, Call> running = new LinkedHashMap<>();
+    private final LinkedList<Call> finished = new LinkedList<>();
+    private final LinkedList<Call> waiting = new LinkedList<>();
+    private final LinkedList<Call> running = new LinkedList<>();
 
     Dispatcher(JSpider spider, ExecutorService executor) {
         this.spider = spider;
         this.executor = executor;
     }
 
-    synchronized void enqueue(List<Call> calls) {
-        for (Call call : calls) {
-            URI uri = call.seed().uri();
-            if (!contains(uri)) {
-                waiting.put(uri, call);
+    synchronized void enqueue(List<Call> calls, boolean depthFirst) {
+        if (depthFirst) {
+            for (int i = calls.size() - 1; i >= 0; i--) {
+                Call call = calls.get(i);
+                if (!contains(call.seed().uri())) {
+                    waiting.addFirst(call);
+                }
+            }
+        } else {
+            for (Call call : calls) {
+                if (!contains(call.seed().uri())) {
+                    waiting.addLast(call);
+                }
             }
         }
         promoteCalls();
     }
 
-    private void enqueue(Call call) {
-        URI uri = call.seed().uri();
-        if (!contains(uri)) {
-            waiting.put(uri, call);
-            promoteCalls();
-        }
-    }
-
     private void promoteCalls() {
         if (running.size() >= spider.maxSeedOnRunning()) return;
         if (!waiting.isEmpty()) {
-            Iterator<Call> values = waiting.values().iterator();
+            Iterator<Call> values = waiting.iterator();
             while (values.hasNext()) {
                 Call call = values.next();
-                running.put(call.seed().uri(), call);
+                running.add(call);
                 executor.submit(call);
                 values.remove();
                 if (running.size() >= spider.maxSeedOnRunning()) break;
@@ -58,34 +56,23 @@ final class Dispatcher {
         }
     }
 
-    synchronized boolean tryEnqueueRunning(Call call) {
-        URI uri = call.seed().uri();
-        return !contains(uri) && running.put(uri, call) == null;
-    }
-
     // 从 running 中移除，并根据情况添加至 finished 或 waiting
     synchronized void finished(Call call, Exception reason) {
         Seed seed = call.seed();
         URI uri = seed.uri();
-        running.remove(uri);
+        removeByURI(running, uri);
         if (reason == null) {
-            finished.put(uri, call);
+            finished.add(call);
             promoteCalls();
         } else if (call.count() < spider.maxTry()) {
-            enqueue(call);
+            enqueue(Collections.singletonList(call), spider.depthFirst());
         } else {
             call.incrementCount();
-            finished.put(uri, call);
+            finished.add(call);
             promoteCalls();
         }
         System.out.println("running size = " + running.size());
         System.out.println("waiting size = " + waiting.size());
-//        if (success || call.count() >= spider.maxTry()) {
-//            finished.put(uri, call);
-//            promoteCalls();
-//        } else {
-//            enqueue(call);
-//        }
         EventListener listener = spider.listener();
         if (reason == null) {
             listener.onSuccess(seed);
@@ -95,8 +82,8 @@ final class Dispatcher {
     }
 
     synchronized void handled(Scrap scrap) {
-        URI uri = scrap.uri();
-        assert waiting.remove(uri) == null; // todo 这儿是不需要的，暂时加在这儿测试。
+//        URI uri = scrap.uri();
+//        assert !removeByURI(waiting, uri); // todo 这儿是不需要的，暂时加在这儿测试。
 //        handled.add(scrap);
         spider.listener().onHandled(scrap);
     }
@@ -107,10 +94,9 @@ final class Dispatcher {
     }
 
     private void onAllFinished() {
-        Collection<Call> calls = finished.values();
         List<Seed> success = new ArrayList<>();
         List<Seed> failed = new ArrayList<>();
-        for (Call call : calls) {
+        for (Call call : finished) {
             Seed seed = call.seed();
             if (call.count() > spider.maxTry()) {
                 failed.add(seed);
@@ -118,11 +104,23 @@ final class Dispatcher {
                 success.add(seed);
             }
         }
-//        spider.listener().onFinished(all, failed, handled);
         spider.seedJar().save(success, failed, reachedMaxDepth);
     }
 
     private boolean contains(URI uri) {
-        return running.containsKey(uri) || waiting.containsKey(uri) || finished.containsKey(uri);
+        return containsByURI(running, uri) || containsByURI(waiting, uri) || containsByURI(finished, uri);
+    }
+
+    private static boolean containsByURI(Collection<Call> calls, final URI uri) {
+        for (Call call : calls) {
+            if (uri.equals(call.seed().uri())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static void removeByURI(Collection<Call> calls, final URI uri) {
+        calls.removeIf(call -> uri.equals(call.seed().uri()));
     }
 }

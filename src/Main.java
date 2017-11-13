@@ -10,10 +10,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +30,7 @@ public class Main {
 
 
     static {
-        SAVE_DIR = new File("/home/cxx/图片/Temp");
+        SAVE_DIR = new File("/Users/cxx/Pictures/spider");
 
         COOKIE_JAR = new CookieJar() {
             private Map<String, List<Cookie>> cookies = new ConcurrentHashMap<>();
@@ -88,7 +85,7 @@ public class Main {
         Map<String, String> def = new HashMap<>();
         def.put("dir", "Bing");
 //        SPIDER.start("image", "https://www.coolapk.com/apk/", def);
-        SPIDER.start("image", "https://bing.ioliu.cn/?p=1", def);
+        SPIDER.start("image", "https://bing.ioliu.cn/", def);
     }
 
     private static void testJsoup() throws IOException {
@@ -162,7 +159,7 @@ public class Main {
 
         @Override
         public List<Seed> load() {
-            return null;
+            return Collections.emptyList();
         }
     }
 

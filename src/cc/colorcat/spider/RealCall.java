@@ -4,7 +4,6 @@ import cc.colorcat.spider.internal.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -45,13 +44,14 @@ final class RealCall implements Call {
         Exception reason = null;
         try {
             List<? extends Seed> newSeeds = getScrapsWitInterceptorChain();
-            if (!newSeeds.isEmpty()) {
-                if (spider.depthFirst()) {
-                    depthCrawl(newSeeds);
-                } else {
-                    breadthCrawl(newSeeds);
-                }
-            }
+//            if (!newSeeds.isEmpty()) {
+//                if (spider.depthFirst()) {
+//                    depthCrawl(newSeeds);
+//                } else {
+//                    breadthCrawl(newSeeds);
+//                }
+            spider.mapAndEnqueue(newSeeds);
+//            }
         } catch (Exception e) {
             reason = e;
             Log.e(e);
@@ -65,20 +65,20 @@ final class RealCall implements Call {
         execute();
     }
 
-    private void depthCrawl(List<? extends Seed> seeds) throws IOException {
-        LinkedList<? extends Seed> newSeeds = new LinkedList<>(seeds);
-        for (Seed seed = newSeeds.pollFirst(); seed != null; seed = newSeeds.pollFirst()) {
-            RealCall call = new RealCall(spider, seed);
-            if (spider.dispatcher().tryEnqueueRunning(call)) {
-                call.execute();
-            }
-        }
-    }
-
-    private void breadthCrawl(List<? extends Seed> seeds) {
+//    private void depthCrawl(List<? extends Seed> seeds) throws IOException {
+//        LinkedList<? extends Seed> newSeeds = new LinkedList<>(seeds);
+//        for (Seed seed = newSeeds.pollFirst(); seed != null; seed = newSeeds.pollFirst()) {
+//            RealCall call = new RealCall(spider, seed);
+//            if (spider.dispatcher().tryEnqueueRunning(call)) {
+//                call.execute();
+//            }
+//        }
+//    }
+//
+//    private void breadthCrawl(List<? extends Seed> seeds) {
 //        spider.dispatcher().enqueue(scraps);
-        spider.mapAndEnqueue(seeds);
-    }
+//        spider.mapAndEnqueue(seeds);
+//    }
 
     private List<Scrap> getScrapsWitInterceptorChain() throws IOException {
         incrementCount();

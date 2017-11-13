@@ -32,7 +32,7 @@ public class BingPaper {
                     Scrap scrap = seed.newScrapWithFill("url", url);
                     scraps.add(scrap);
                 }
-                Element element = doc.selectFirst("a[href~=/\\?p=(\\d)+]");
+                Element element = doc.select("a[href~=/\\?p=(\\d)+]").last();
                 String nextSubUrl = element.attr("href");
                 scraps.add(seed.newScrapWithJoin(nextSubUrl));
                 return scraps;
