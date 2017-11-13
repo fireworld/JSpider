@@ -12,8 +12,11 @@ import java.nio.charset.Charset;
  * xx.ch@outlook.com
  */
 public class OkConnection implements Connection {
+    private static final String HTTP = "http";
+    private static final String HTTPS = "https";
     private OkHttpClient client;
     private WebSnapshot snapshot;
+    private URI uri;
 
     public OkConnection() {
         client = new OkHttpClient.Builder()
@@ -26,7 +29,19 @@ public class OkConnection implements Connection {
 
     @Override
     public WebSnapshot get(URI uri) throws IOException {
-        if (snapshot != null && snapshot.isSuccess()) return snapshot;
+        String scheme = Utils.nullElse(uri.getScheme(), "").toLowerCase();
+        if (!HTTP.equals(scheme) && !HTTPS.equals(scheme)) {
+            throw new UnsupportedOperationException("Unsupported uri, uri = " + uri.toString());
+        }
+        if (snapshot != null && snapshot.isSuccess() && uri.equals(this.uri)) {
+            return snapshot;
+        }
+        this.uri = uri;
+        this.snapshot = doGet(uri);
+        return this.snapshot;
+    }
+
+    private WebSnapshot doGet(URI uri) throws IOException {
         Request request = new Request.Builder().url(uri.toString()).get().build();
         Response response = client.newCall(request).execute();
         if (response.code() == 200) {
@@ -35,16 +50,13 @@ public class OkConnection implements Connection {
                 try {
                     MediaType mediaType = body.contentType();
                     Charset charset = mediaType != null ? mediaType.charset(Utils.UTF8) : Utils.UTF8;
-                    snapshot = WebSnapshot.newSuccess(uri, body.string(), charset);
+                    return WebSnapshot.newSuccess(uri, body.string(), charset);
                 } finally {
                     Utils.close(body);
                 }
             }
         }
-        if (snapshot == null) {
-            throw new IOException("response, code = " + response.code() + ", msg = " + response.message());
-        }
-        return snapshot;
+        return WebSnapshot.newFailed(uri);
     }
 
     @SuppressWarnings("CloneDoesntCallSuperClone")
