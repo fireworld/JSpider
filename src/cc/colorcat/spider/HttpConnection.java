@@ -43,7 +43,7 @@ final class HttpConnection implements Connection {
         InputStream is = null;
         try {
             conn = (HttpURLConnection) new URL(uri.toString()).openConnection();
-            conn.setRequestMethod("get");
+            conn.setRequestMethod("GET");
             conn.setConnectTimeout(10000);
             conn.setReadTimeout(10000);
             int code = conn.getResponseCode();

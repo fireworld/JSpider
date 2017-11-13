@@ -22,6 +22,7 @@ public class JSpider implements Call.Factory {
     private final int maxSeedOnRunning;
     private final int maxDepth;
     private final EventListener listener;
+    private final SeedJar seedJar;
 
     private JSpider(Builder builder) {
         this.handlers = Utils.immutableMap(builder.handlers);
@@ -36,6 +37,7 @@ public class JSpider implements Call.Factory {
         this.maxSeedOnRunning = builder.maxSeedOnRunning;
         this.maxDepth = builder.maxDepth;
         this.listener = builder.listener;
+        this.seedJar = builder.seedJar;
     }
 
     ExecutorService executor() {
@@ -82,6 +84,10 @@ public class JSpider implements Call.Factory {
         return listener;
     }
 
+    SeedJar seedJar() {
+        return seedJar;
+    }
+
     public void start(String tag, String uri) {
         start(tag, uri, Collections.emptyMap());
     }
@@ -97,7 +103,7 @@ public class JSpider implements Call.Factory {
     public void start(String tag, List<String> uris, Map<String, String> defaultData) {
         List<Seed> seeds = Seed.newSeeds(tag, uris, defaultData);
         mapAndEnqueue(seeds);
-        listener.onStart(seeds);
+//        listener.onStart(seeds);
     }
 
     void mapAndEnqueue(List<? extends Seed> seeds) {
@@ -129,12 +135,14 @@ public class JSpider implements Call.Factory {
         private int maxSeedOnRunning = 20;
         private int maxDepth = 100;
         private EventListener listener;
+        private SeedJar seedJar;
 
         public Builder() {
             handlers = new HashMap<>();
             interceptors = new ArrayList<>();
             parsers = new ArrayList<>();
             listener = EventListener.EMPTY_LISTENER;
+            seedJar = SeedJar.NO_SEEDS;
         }
 
         public Builder(JSpider spider) {
@@ -148,6 +156,7 @@ public class JSpider implements Call.Factory {
             this.maxSeedOnRunning = spider.maxSeedOnRunning;
             this.maxDepth = spider.maxDepth;
             this.listener = spider.listener;
+            this.seedJar = spider.seedJar;
         }
 
         public Builder registerHandler(String tag, Handler handler) {
@@ -231,6 +240,11 @@ public class JSpider implements Call.Factory {
 
         public Builder eventListener(EventListener listener) {
             this.listener = Utils.nullElse(listener, EventListener.EMPTY_LISTENER);
+            return this;
+        }
+
+        public Builder seedJar(SeedJar seedJar) {
+            this.seedJar = Utils.nullElse(seedJar, SeedJar.NO_SEEDS);
             return this;
         }
 

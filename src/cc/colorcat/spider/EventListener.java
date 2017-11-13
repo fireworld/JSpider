@@ -8,10 +8,10 @@ import java.util.List;
  */
 public interface EventListener {
     EventListener EMPTY_LISTENER = new EventListener() {
-        @Override
-        public void onStart(List<Seed> seeds) {
-
-        }
+//        @Override
+//        public void onStart(List<Seed> seeds) {
+//
+//        }
 
         @Override
         public void onSuccess(Seed seed) {
@@ -19,12 +19,7 @@ public interface EventListener {
         }
 
         @Override
-        public void onFailed(Seed seed, Exception reason) {
-
-        }
-
-        @Override
-        public void onHandled(Scrap scrap) {
+        public void onFailure(Seed seed, Exception reason) {
 
         }
 
@@ -34,20 +29,25 @@ public interface EventListener {
         }
 
         @Override
-        public void onFinished(List<Seed> allSeeds, List<Seed> failedSeeds, List<Scrap> handledScraps) {
+        public void onHandled(Scrap scrap) {
 
         }
+
+//        @Override
+//        public void onFinished(List<Seed> allSeeds, List<Seed> failedSeeds, List<Scrap> handledScraps) {
+//
+//        }
     };
 
-    void onStart(List<Seed> seeds);
+//    void onStart(List<Seed> seeds);
 
     void onSuccess(Seed seed);
 
-    void onFailed(Seed seed, Exception reason);
-
-    void onHandled(Scrap scrap);
+    void onFailure(Seed seed, Exception reason);
 
     void onReachedMaxDepth(Seed seed);
 
-    void onFinished(List<Seed> allSeeds, List<Seed> failedSeeds, List<Scrap> handledScraps);
+    void onHandled(Scrap scrap);
+
+//    void onFinished(List<Seed> allSeeds, List<Seed> failedSeeds, List<Scrap> handledScraps);
 }

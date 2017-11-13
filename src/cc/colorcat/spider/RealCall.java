@@ -83,7 +83,9 @@ final class RealCall implements Call {
     private List<Scrap> getScrapsWitInterceptorChain() throws IOException {
         incrementCount();
         List<Interceptor> users = spider.interceptors();
-        List<Interceptor> interceptors = new ArrayList<>(users.size() + 1);
+        List<Interceptor> interceptors = new ArrayList<>(users.size() + 3);
+        interceptors.add(new SeedsCleanerInterceptor(spider));
+        interceptors.add(new HandlerInterceptor(spider));
         interceptors.addAll(users);
         interceptors.add(new ConnectionInterceptor());
         Interceptor.Chain chain = new RealInterceptorChain(interceptors, 0, seed, connection, parser);

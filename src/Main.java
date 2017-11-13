@@ -32,7 +32,7 @@ public class Main {
 
 
     static {
-        SAVE_DIR = new File("D:\\temp");
+        SAVE_DIR = new File("/home/cxx/图片/Temp");
 
         COOKIE_JAR = new CookieJar() {
             private Map<String, List<Cookie>> cookies = new ConcurrentHashMap<>();
@@ -59,16 +59,17 @@ public class Main {
                 .addParser(new CoolapkParser())
                 .registerHandler("image", new ImageHandler(new Downloader(CLIENT), SAVE_DIR))
                 .eventListener(new LogListener())
-                .connection(new OkConnection(CLIENT))
+//                .connection(new OkConnection(CLIENT))
+                .seedJar(new LogSeedJar())
                 .build();
     }
 
     public static void main(String[] args) throws IOException {
-        String path = "D:\\Workspace\\IdeaProjects\\JSpider\\src\\CoolapkParser.java";
-        InputStream is = new FileInputStream(path);
-        String s = Utils.toString(is, Utils.UTF8);
-        System.out.println(s);
-//        testJSpider();
+//        String path = "D:\\Workspace\\IdeaProjects\\JSpider\\src\\CoolapkParser.java";
+//        InputStream is = new FileInputStream(path);
+//        String s = Utils.toString(is, Utils.UTF8);
+//        System.out.println(s);
+        testJSpider();
 //        testJsoup();
 //        testDownload("https://bing.ioliu.cn//photo/FreshSalt_ZH-CN12818759319?force=download");
     }
@@ -118,10 +119,6 @@ public class Main {
     }
 
     private static class LogListener implements EventListener {
-        @Override
-        public void onStart(List<Seed> seeds) {
-//            Log.i("onStart, seeds = " + seeds.toString());
-        }
 
         @Override
         public void onSuccess(Seed seed) {
@@ -129,7 +126,7 @@ public class Main {
         }
 
         @Override
-        public void onFailed(Seed seed, Exception reason) {
+        public void onFailure(Seed seed, Exception reason) {
 //            Log.w("onFailed, seed = " + seed.toString());
         }
 
@@ -142,20 +139,50 @@ public class Main {
         public void onReachedMaxDepth(Seed seed) {
 
         }
+    }
+
+    private static class LogSeedJar implements SeedJar {
+        @Override
+        public void save(List<Seed> success, List<Seed> failed, List<Seed> reachedMaxDepth) {
+            Log("success", success);
+            Log("failed", failed);
+            Log("reachedMaxDepth", reachedMaxDepth);
+        }
 
         @Override
-        public void onFinished(List<Seed> allSeeds, List<Seed> failedSeeds, List<Scrap> handledScraps) {
-            Log("AllSeeds", allSeeds);
-            Log("failedSeeds", failedSeeds);
-            Log("handledScraps", handledScraps);
+        public List<Seed> load() {
+            return null;
         }
+    }
 
-        private static void Log(String tag, List<? extends Seed> scraps) {
-            System.out.println("------------------------------- " + tag + " -------------------------------");
-            for (Seed scrap : scraps) {
-                System.out.println(scrap);
+    private static void Log(String tag, List<? extends Seed> seeds) {
+        System.err.println(buildLine(tag, 50, true));
+        if (seeds.isEmpty()) {
+            System.err.println("empty");
+        } else {
+            for (Seed scrap : seeds) {
+                System.err.println(scrap);
             }
-            System.out.println("----------------------------------------------------------------------");
         }
+        System.err.println(buildLine(tag, 50, false));
+    }
+
+    private static String buildLine(String tag, int numOfHalf, boolean withTag) {
+        StringBuilder result = new StringBuilder();
+        String half = buildLine(numOfHalf);
+        if (withTag) {
+            result.append(half).append(' ').append(tag).append(' ').append(half);
+        } else {
+            result.append(half).append(buildLine(tag.length() + 2)).append(half).append('\n').append('\n');
+        }
+        return result.toString();
+    }
+
+    private static String buildLine(int num) {
+        StringBuilder line = new StringBuilder();
+        for (int i = 0; i < num; i++) {
+            line.append("-");
+        }
+        return line.toString();
     }
 }
