@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -56,11 +57,14 @@ public class Main {
                 .build();
 
         SPIDER = new JSpider.Builder()
-                .addParser(new CoolapkParser())
+//                .addParser(new CoolapkParser())
+                .addParser(new BingPaper.BingParser())
                 .registerHandler("image", new ImageHandler(new Downloader(CLIENT), SAVE_DIR))
+                .registerHandler("image", new BingPaper.BingHandler(new Downloader(CLIENT), SAVE_DIR))
                 .eventListener(new LogListener())
 //                .connection(new OkConnection(CLIENT))
                 .seedJar(new LogSeedJar())
+                .maxDepth(3)
                 .build();
     }
 
@@ -70,14 +74,21 @@ public class Main {
 //        String s = Utils.toString(is, Utils.UTF8);
 //        System.out.println(s);
         testJSpider();
+//        String reg = "/\\?p=(\\d)+";
+//        String text = "/?p=01";
+//        System.out.println(text.matches(reg));
 //        testJsoup();
 //        testDownload("https://bing.ioliu.cn//photo/FreshSalt_ZH-CN12818759319?force=download");
+//        String reg = "^(/photo/)(.)*(force=download)$";
+//        String text = "/photo/KyrgyzstanCat_EN-AU10859527245?force=download";
+//        System.out.println(text.matches(reg));
     }
 
     private static void testJSpider() {
         Map<String, String> def = new HashMap<>();
-        def.put("dir", "testImage");
-        SPIDER.start("image", "https://www.coolapk.com/apk/", def);
+        def.put("dir", "Bing");
+//        SPIDER.start("image", "https://www.coolapk.com/apk/", def);
+        SPIDER.start("image", "https://bing.ioliu.cn/?p=1", def);
     }
 
     private static void testJsoup() throws IOException {
@@ -137,7 +148,7 @@ public class Main {
 
         @Override
         public void onReachedMaxDepth(Seed seed) {
-
+            Log("onReachedMaxDepth", Collections.singletonList(seed));
         }
     }
 

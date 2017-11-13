@@ -56,6 +56,7 @@ public class Downloader {
                     bi = Okio.buffer(body.source());
                     bo = Okio.buffer(Okio.sink(savePath));
                     bo.writeAll(bi);
+                    bo.flush();
                 } finally {
                     Utils.close(bi);
                     Utils.close(bo);
