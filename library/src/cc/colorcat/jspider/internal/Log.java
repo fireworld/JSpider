@@ -1,8 +1,6 @@
 package cc.colorcat.jspider.internal;
 
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
 /**
  * Created by cxx on 17-11-9.
@@ -13,10 +11,21 @@ public class Log {
 
     static {
         LOGGER = Logger.getLogger("JSpider");
+        Level level = Level.ALL;
+        Formatter formatter = new Formatter() {
+            @Override
+            public synchronized String format(LogRecord record) {
+                return record.getLoggerName() + " --> " + record.getMessage() + "\n";
+            }
+        };
+        for (Handler handler : LOGGER.getParent().getHandlers()) {
+            handler.setLevel(Level.OFF);
+        }
         ConsoleHandler handler = new ConsoleHandler();
-        handler.setLevel(Level.ALL);
+        handler.setFormatter(formatter);
+        handler.setLevel(level);
         LOGGER.addHandler(handler);
-        LOGGER.setLevel(Level.ALL);
+        LOGGER.setLevel(level);
     }
 
     public static void f(String msg) {
