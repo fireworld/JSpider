@@ -85,6 +85,10 @@ public class Seed {
         return this.uri;
     }
 
+    public final String newUriWithJoin(String uri) {
+        return this.uri.resolve(uri).toString();
+    }
+
     public final String baseUrl() {
         try {
             return URLUtil.getBase(uri.toURL()).toString();

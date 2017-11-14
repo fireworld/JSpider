@@ -28,7 +28,7 @@ public class BingPaper {
                 Elements elements = doc.select("a[class='ctrl download'][href~=^(/photo/)(.)*(force=download)$][target='_blank'][rel=nofollow]");
                 for (Element element : elements) {
                     String href = element.attr("href");
-                    String url = seed.uri().resolve(href).toString();
+                    String url = seed.newUriWithJoin(href);
                     Scrap scrap = seed.newScrapWithFill("url", url);
                     scraps.add(scrap);
                 }
