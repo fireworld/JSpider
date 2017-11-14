@@ -7,43 +7,65 @@ import okio.Okio;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by cxx on 17-11-9.
  * xx.ch@outlook.com
  */
 public class Downloader {
-
-    private OkHttpClient client;
+    private static final int MAX_RETRY = 3;
+    private final Map<String, Task> tasks = new HashMap<>();
+    private final OkHttpClient client;
 
     public Downloader(OkHttpClient client) {
         this.client = client;
     }
 
-    public void download(String url, File savePath) throws IOException {
-        Response response = client.newCall(new Request.Builder().url(url).get().build()).execute();
-        write(response, savePath);
+    public void download(String url, File savePath) {
+        synchronized (tasks) {
+            Task task = new Task(url, savePath);
+            if (!tasks.containsKey(url)) {
+                tasks.put(url, task);
+                realDownload(new Task(url, savePath));
+            }
+        }
     }
 
-    public void submit(String url, File savePath) {
-        client.newCall(new Request.Builder().url(url).get().build()).enqueue(new Callback() {
+    private void realDownload(Task task) {
+        client.newCall(new Request.Builder().url(task.url).get().build()).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Log.w("Download failure, url = " + call.request().url());
                 Log.e(e);
+                notifyTaskFinish(task, false);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                write(response, savePath);
-                Log.w("Download success, url = " + call.request().url());
+                try {
+                    write(response, task.savePath);
+                    notifyTaskFinish(task, true);
+                } catch (IOException e) {
+                    notifyTaskFinish(task, false);
+                    throw e;
+                }
             }
         });
     }
 
-    private static boolean createDir(File savePath) {
-        File parent = savePath.getParentFile();
-        return parent.exists() || parent.mkdirs();
+    private synchronized void notifyTaskFinish(Task task, boolean success) {
+        String msg;
+        if (!success) {
+            msg = "Download failed, url = ";
+            task.count++;
+            if (task.count < MAX_RETRY) {
+                realDownload(task);
+            }
+        } else {
+            msg = "Download success, url = ";
+        }
+        Log.w(msg + task.url);
     }
 
     private void write(Response response, File savePath) throws IOException {
@@ -63,6 +85,17 @@ public class Downloader {
                     Utils.close(body);
                 }
             }
+        }
+    }
+
+    private static class Task {
+        private String url;
+        private File savePath;
+        private int count = 0;
+
+        private Task(String url, File savePath) {
+            this.url = url;
+            this.savePath = savePath;
         }
     }
 }

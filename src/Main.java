@@ -5,14 +5,9 @@ import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -28,7 +23,7 @@ public class Main {
     private static final File SAVE_DIR;
 
     static {
-        SAVE_DIR = new File("/Users/cxx/Pictures/spider");
+        SAVE_DIR = new File("D:\\temp");
 
         COOKIE_JAR = new CookieJar() {
             private Map<String, List<Cookie>> cookies = new ConcurrentHashMap<>();
@@ -59,13 +54,13 @@ public class Main {
                 .eventListener(new LogListener())
                 .connection(new OkConnection(CLIENT))
                 .seedJar(new LogSeedJar())
-                .maxDepth(3)
+                .maxDepth(5)
                 .build();
     }
 
     public static void main(String[] args) throws IOException {
-//        testJSpider();
-        genericTest();
+        testJSpider();
+//        genericTest();
     }
 
     private static void genericTest() {
@@ -74,7 +69,8 @@ public class Main {
     private static void testJSpider() {
         Map<String, String> def = new HashMap<>();
         def.put("dir", "Bing");
-        SPIDER.start("image", "https://bing.ioliu.cn/", def);
+//        SPIDER.start("image", "https://bing.ioliu.cn/", def);
+        SPIDER.start("image", "https://bing.ioliu.cn/ranking", def);
     }
 
 
@@ -94,7 +90,7 @@ public class Main {
             if (url != null && url.matches("^(http)(s)?://(.)*\\.(jpg|png|jpeg)$")) {
                 String folderName = data.get("dir");
                 String fileName = url.substring(url.lastIndexOf('/') + 1, url.length());
-                downloader.submit(url, Utils.createSavePath(directory, folderName, fileName));
+                downloader.download(url, Utils.createSavePath(directory, folderName, fileName));
                 return true;
             }
             return false;

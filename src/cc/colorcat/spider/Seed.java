@@ -11,6 +11,7 @@ import java.util.*;
  * Created by cxx on 2017/11/13.
  * xx.ch@outlook.com
  */
+@SuppressWarnings("unused")
 public class Seed {
     final String tag;
     final URI uri;
@@ -135,6 +136,10 @@ public class Seed {
             data.put(key, value);
         }
         return this;
+    }
+
+    public final Seed newSeedWithResetDepth() {
+        return new Seed(tag, uri, 0, new HashMap<>(data));
     }
 
     public final Scrap newScrapWithFill(String key, String value) {

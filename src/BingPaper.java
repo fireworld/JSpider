@@ -32,9 +32,11 @@ public class BingPaper {
                     Scrap scrap = seed.newScrapWithFill("url", url);
                     scraps.add(scrap);
                 }
-                Element element = doc.select("a[href~=/\\?p=(\\d)+]").last();
-                String nextSubUrl = element.attr("href");
-                scraps.add(seed.newScrapWithJoin(nextSubUrl));
+                Element element = doc.select("a[href~=/(.)*\\?p=(\\d)+]").last();
+                if (element != null) {
+                    String nextSubUrl = element.attr("href");
+                    scraps.add(seed.newScrapWithJoin(nextSubUrl));
+                }
                 return scraps;
             }
             return Collections.emptyList();
@@ -65,7 +67,7 @@ public class BingPaper {
                     } else {
                         fileName = System.nanoTime() + ".jpg";
                     }
-                    downloader.submit(url, Utils.createSavePath(directory, folderName, fileName));
+                    downloader.download(url, Utils.createSavePath(directory, folderName, fileName));
                     return true;
                 }
             }
