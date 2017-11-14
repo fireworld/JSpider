@@ -1,4 +1,5 @@
 import cc.colorcat.spider.*;
+import cc.colorcat.spider.EventListener;
 import cc.colorcat.spider.internal.Utils;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
@@ -11,10 +12,8 @@ import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.net.URI;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -23,11 +22,10 @@ import java.util.concurrent.TimeUnit;
  * xx.ch@outlook.com
  */
 public class Main {
-    public static final CookieJar COOKIE_JAR;
-    public static final OkHttpClient CLIENT;
-    public static final JSpider SPIDER;
-    public static final File SAVE_DIR;
-
+    private static final CookieJar COOKIE_JAR;
+    private static final OkHttpClient CLIENT;
+    private static final JSpider SPIDER;
+    private static final File SAVE_DIR;
 
     static {
         SAVE_DIR = new File("/Users/cxx/Pictures/spider");
@@ -59,52 +57,30 @@ public class Main {
                 .registerHandler("image", new ImageHandler(new Downloader(CLIENT), SAVE_DIR))
                 .registerHandler("image", new BingPaper.BingHandler(new Downloader(CLIENT), SAVE_DIR))
                 .eventListener(new LogListener())
-//                .connection(new OkConnection(CLIENT))
+                .connection(new OkConnection(CLIENT))
                 .seedJar(new LogSeedJar())
                 .maxDepth(3)
                 .build();
     }
 
     public static void main(String[] args) throws IOException {
-//        String path = "D:\\Workspace\\IdeaProjects\\JSpider\\src\\CoolapkParser.java";
-//        InputStream is = new FileInputStream(path);
-//        String s = Utils.toString(is, Utils.UTF8);
-//        System.out.println(s);
-        testJSpider();
-//        String reg = "/\\?p=(\\d)+";
-//        String text = "/?p=01";
-//        System.out.println(text.matches(reg));
-//        testJsoup();
-//        testDownload("https://bing.ioliu.cn//photo/FreshSalt_ZH-CN12818759319?force=download");
-//        String reg = "^(/photo/)(.)*(force=download)$";
-//        String text = "/photo/KyrgyzstanCat_EN-AU10859527245?force=download";
-//        System.out.println(text.matches(reg));
+//        testJSpider();
+        genericTest();
+    }
+
+    private static void genericTest() {
     }
 
     private static void testJSpider() {
         Map<String, String> def = new HashMap<>();
         def.put("dir", "Bing");
-//        SPIDER.start("image", "https://www.coolapk.com/apk/", def);
         SPIDER.start("image", "https://bing.ioliu.cn/", def);
     }
 
-    private static void testJsoup() throws IOException {
-        Document doc = Jsoup.connect("https://www.coolapk.com/apk/").get();
-        Elements elements = doc.select("img[src~=^(http)(s)?://(.)*\\.(jpg|png|jpeg)$]");
-        for (Element element : elements) {
-            System.out.println(element.attr("src"));
-        }
-    }
-
-    private static void testDownload(String url) throws IOException {
-        File path = new File(SAVE_DIR, System.currentTimeMillis() + ".jpg");
-        new Downloader(CLIENT).download(url, path);
-    }
 
     private static class ImageHandler implements Handler {
         private final Downloader downloader;
         private final File directory;
-
 
         private ImageHandler(Downloader downloader, File directory) {
             this.downloader = downloader;
@@ -112,13 +88,12 @@ public class Main {
         }
 
         @Override
-
         public boolean handle(Scrap scrap) {
             Map<String, String> data = scrap.data();
             String url = data.get("url");
             if (url != null && url.matches("^(http)(s)?://(.)*\\.(jpg|png|jpeg)$")) {
-                String fileName = url.substring(url.lastIndexOf('/') + 1, url.length());
                 String folderName = data.get("dir");
+                String fileName = url.substring(url.lastIndexOf('/') + 1, url.length());
                 downloader.submit(url, Utils.createSavePath(directory, folderName, fileName));
                 return true;
             }
@@ -126,8 +101,8 @@ public class Main {
         }
     }
 
-    private static class LogListener implements EventListener {
 
+    private static class LogListener implements EventListener {
         @Override
         public void onSuccess(Seed seed) {
 //            Log.i("onSuccess, seed = " + seed.toString());
@@ -149,6 +124,7 @@ public class Main {
         }
     }
 
+
     private static class LogSeedJar implements SeedJar {
         @Override
         public void save(List<Seed> success, List<Seed> failed, List<Seed> reachedMaxDepth) {
@@ -162,6 +138,7 @@ public class Main {
             return Collections.emptyList();
         }
     }
+
 
     private static void Log(String tag, List<? extends Seed> seeds) {
         System.err.println(buildLine(tag, 50, true));

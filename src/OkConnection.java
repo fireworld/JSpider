@@ -1,5 +1,5 @@
-package cc.colorcat.spider;
-
+import cc.colorcat.spider.Connection;
+import cc.colorcat.spider.WebSnapshot;
 import cc.colorcat.spider.internal.Utils;
 import okhttp3.*;
 
@@ -37,8 +37,7 @@ public class OkConnection implements Connection {
             return snapshot;
         }
         this.uri = uri;
-        this.snapshot = doGet(uri);
-        return this.snapshot;
+        return this.snapshot = doGet(uri);
     }
 
     private WebSnapshot doGet(URI uri) throws IOException {

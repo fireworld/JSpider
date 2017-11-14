@@ -51,14 +51,10 @@ public final class Utils {
         return Collections.unmodifiableList(new ArrayList<>(list));
     }
 
-    public static boolean isHttpUrl(String url) {
-        return url != null && url.toLowerCase().matches(REG_HTTP_URL);
-    }
-
     public static boolean isHttpUrl(URI uri) {
         if (uri == null) return false;
         String scheme = uri.getScheme();
-        return scheme != null && scheme.toLowerCase().startsWith("http");
+        return scheme != null && scheme.toLowerCase().matches("(http)(s)?");
     }
 
     public static String urlJoin(String base, String url) {
@@ -79,7 +75,7 @@ public final class Utils {
         }
     }
 
-    public static Charset parseCharset(String contentType) {
+    public static Charset parseCharset(String contentType, Charset defaultCharset) {
         if (contentType != null) {
             String[] params = contentType.split(";");
             final int length = params.length;
@@ -90,13 +86,13 @@ public final class Utils {
                         try {
                             return Charset.forName(pair[1]);
                         } catch (Exception ignore) {
-                            return null;
+                            return defaultCharset;
                         }
                     }
                 }
             }
         }
-        return null;
+        return defaultCharset;
     }
 
     public static <T> T nullElse(T value, T other) {
@@ -107,7 +103,7 @@ public final class Utils {
         return text == null || text.length() == 0;
     }
 
-    public static String toString(InputStream is, Charset charset) throws IOException {
+    public static String justReadString(InputStream is, Charset charset) throws IOException {
         StringBuilder sb = new StringBuilder();
         BufferedReader br = new BufferedReader(new InputStreamReader(is, charset));
         char[] buffer = new char[1024];

@@ -14,12 +14,8 @@ public final class WebSnapshot {
     private String resource;
     private Charset charset;
 
-    public static WebSnapshot newSuccess(String uri, String resource, String charset) {
-        return newSuccess(URI.create(uri), resource, Charset.forName(charset));
-    }
-
-    public static WebSnapshot newSuccess(String uri, String resource, Charset charset) {
-        return newSuccess(URI.create(uri), resource, charset);
+    public static WebSnapshot newSuccess(URI uri, String resource) {
+        return newSuccess(uri, resource, Utils.UTF8);
     }
 
     public static WebSnapshot newSuccess(URI uri, String resource, Charset charset) {
@@ -60,7 +56,7 @@ public final class WebSnapshot {
         return this.charset;
     }
 
-    boolean isSuccess() {
+    public boolean isSuccess() {
         return !Utils.isEmpty(resource);
     }
 

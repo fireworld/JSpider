@@ -1,5 +1,7 @@
 package cc.colorcat.spider;
 
+import cc.colorcat.spider.internal.Log;
+
 import java.net.URI;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -11,7 +13,6 @@ import java.util.concurrent.ExecutorService;
 final class Dispatcher {
     private final JSpider spider;
     private final ExecutorService executor;
-    //    private final List<Scrap> handled = new LinkedList<>();
     private final List<Seed> reachedMaxDepth = new LinkedList<>();
     private final LinkedList<Call> finished = new LinkedList<>();
     private final LinkedList<Call> waiting = new LinkedList<>();
@@ -22,17 +23,17 @@ final class Dispatcher {
         this.executor = executor;
     }
 
-    synchronized void enqueue(List<Call> calls, boolean depthFirst) {
+    synchronized void enqueue(final List<Call> calls, boolean depthFirst) {
         if (depthFirst) {
             for (int i = calls.size() - 1; i >= 0; i--) {
                 Call call = calls.get(i);
-                if (!contains(call.seed().uri())) {
+                if (!uriExists(call.seed().uri())) {
                     waiting.addFirst(call);
                 }
             }
         } else {
             for (Call call : calls) {
-                if (!contains(call.seed().uri())) {
+                if (!uriExists(call.seed().uri())) {
                     waiting.addLast(call);
                 }
             }
@@ -43,12 +44,12 @@ final class Dispatcher {
     private void promoteCalls() {
         if (running.size() >= spider.maxSeedOnRunning()) return;
         if (!waiting.isEmpty()) {
-            Iterator<Call> values = waiting.iterator();
-            while (values.hasNext()) {
-                Call call = values.next();
+            Iterator<Call> iterator = waiting.iterator();
+            while (iterator.hasNext()) {
+                Call call = iterator.next();
                 running.add(call);
                 executor.submit(call);
-                values.remove();
+                iterator.remove();
                 if (running.size() >= spider.maxSeedOnRunning()) break;
             }
         } else if (running.isEmpty()) {
@@ -56,40 +57,41 @@ final class Dispatcher {
         }
     }
 
-    // 从 running 中移除，并根据情况添加至 finished 或 waiting
-    synchronized void finished(Call call, Exception reason) {
+    /**
+     * @param call   the executed task
+     * @param reason the specified {@link Call} executed success if reason is null, else failed.
+     */
+    synchronized void finished(final Call call, final Exception reason) {
         Seed seed = call.seed();
         URI uri = seed.uri();
-        removeByURI(running, uri);
+        removeByUri(running, uri);
         if (reason == null) {
             finished.add(call);
             promoteCalls();
         } else if (call.count() < spider.maxTry()) {
             enqueue(Collections.singletonList(call), spider.depthFirst());
         } else {
-            call.incrementCount();
+            call.incrementCount(); // for judging the executing result of call
             finished.add(call);
             promoteCalls();
         }
-        System.out.println("running size = " + running.size());
-        System.out.println("waiting size = " + waiting.size());
-        EventListener listener = spider.listener();
+        Log.i("running size = " + running.size());
+        Log.i("waiting size = " + waiting.size());
         if (reason == null) {
-            listener.onSuccess(seed);
+            spider.listener().onSuccess(seed);
         } else {
-            listener.onFailure(seed, reason);
+            spider.listener().onFailure(seed, reason);
         }
     }
 
-    synchronized void handled(Scrap scrap) {
-//        URI uri = scrap.uri();
-//        assert !removeByURI(waiting, uri); // todo 这儿是不需要的，暂时加在这儿测试。
-//        handled.add(scrap);
+    void handled(final Scrap scrap) {
         spider.listener().onHandled(scrap);
     }
 
-    synchronized void onReachedMaxDepth(Seed seed) {
-        reachedMaxDepth.add(seed);
+    void onReachedMaxDepth(Seed seed) {
+        synchronized (reachedMaxDepth) {
+            reachedMaxDepth.add(seed);
+        }
         spider.listener().onReachedMaxDepth(seed);
     }
 
@@ -107,11 +109,11 @@ final class Dispatcher {
         spider.seedJar().save(success, failed, reachedMaxDepth);
     }
 
-    private boolean contains(URI uri) {
-        return containsByURI(running, uri) || containsByURI(waiting, uri) || containsByURI(finished, uri);
+    private boolean uriExists(final URI uri) {
+        return containsByUri(running, uri) || containsByUri(waiting, uri) || containsByUri(finished, uri);
     }
 
-    private static boolean containsByURI(Collection<Call> calls, final URI uri) {
+    private static boolean containsByUri(final Collection<Call> calls, final URI uri) {
         for (Call call : calls) {
             if (uri.equals(call.seed().uri())) {
                 return true;
@@ -120,7 +122,7 @@ final class Dispatcher {
         return false;
     }
 
-    private static void removeByURI(Collection<Call> calls, final URI uri) {
+    private static void removeByUri(Collection<Call> calls, URI uri) {
         calls.removeIf(call -> uri.equals(call.seed().uri()));
     }
 }

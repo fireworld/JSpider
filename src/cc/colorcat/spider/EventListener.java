@@ -6,11 +6,6 @@ package cc.colorcat.spider;
  */
 public interface EventListener {
     EventListener EMPTY_LISTENER = new EventListener() {
-//        @Override
-//        public void onStart(List<Seed> seeds) {
-//
-//        }
-
         @Override
         public void onSuccess(Seed seed) {
 
@@ -30,14 +25,7 @@ public interface EventListener {
         public void onHandled(Scrap scrap) {
 
         }
-
-//        @Override
-//        public void onFinished(List<Seed> allSeeds, List<Seed> failedSeeds, List<Scrap> handledScraps) {
-//
-//        }
     };
-
-//    void onStart(List<Seed> seeds);
 
     void onSuccess(Seed seed);
 
@@ -46,6 +34,4 @@ public interface EventListener {
     void onReachedMaxDepth(Seed seed);
 
     void onHandled(Scrap scrap);
-
-//    void onFinished(List<Seed> allSeeds, List<Seed> failedSeeds, List<Scrap> handledScraps);
 }

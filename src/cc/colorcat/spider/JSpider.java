@@ -106,7 +106,20 @@ public class JSpider implements Call.Factory {
     public void start(String tag, List<String> uris, Map<String, String> defaultData) {
         List<Seed> seeds = Seed.newSeeds(tag, uris, defaultData);
         mapAndEnqueue(seeds);
-//        listener.onStart(seeds);
+    }
+
+    public void start(List<Seed> seeds) {
+        if (seeds == null) {
+            throw new NullPointerException("sees == null");
+        }
+        mapAndEnqueue(seeds);
+    }
+
+    public void restartWithSeedJar() {
+        List<Seed> seeds = seedJar.load();
+        if (!seeds.isEmpty()) {
+            mapAndEnqueue(seeds);
+        }
     }
 
     void mapAndEnqueue(List<? extends Seed> seeds) {

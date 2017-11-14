@@ -25,16 +25,14 @@ final class HttpConnection implements Connection {
 
     @Override
     public WebSnapshot get(URI uri) throws IOException {
-        String scheme = Utils.nullElse(uri.getScheme(), "").toLowerCase();
-        if (!HTTP.equals(scheme) && !HTTPS.equals(scheme)) {
+        if (!Utils.isHttpUrl(uri)) {
             throw new UnsupportedOperationException("Unsupported uri, uri = " + uri.toString());
         }
         if (snapshot != null && snapshot.isSuccess() && uri.equals(this.uri)) {
             return snapshot;
         }
         this.uri = uri;
-        this.snapshot = onGet(uri);
-        return this.snapshot;
+        return this.snapshot = onGet(uri);
     }
 
 
@@ -48,10 +46,10 @@ final class HttpConnection implements Connection {
             conn.setReadTimeout(10000);
             int code = conn.getResponseCode();
             if (code == HttpURLConnection.HTTP_OK) {
-                Charset charset = Utils.nullElse(Utils.parseCharset(conn.getContentType()), Utils.UTF8);
+                Charset charset = Utils.parseCharset(conn.getContentType(), Utils.UTF8);
                 is = conn.getInputStream();
                 if (is != null) {
-                    String result = Utils.toString(is, charset);
+                    String result = Utils.justReadString(is, charset);
                     return WebSnapshot.newSuccess(uri, result, charset);
                 }
             }
