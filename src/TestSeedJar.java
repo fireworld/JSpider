@@ -29,8 +29,12 @@ public class TestSeedJar implements SeedJar {
     }
 
     private static void log(List<Seed> seeds) {
-        for (Seed seed : seeds) {
-            Log.i("\t\t" + seed);
+        if (seeds.isEmpty()) {
+            Log.i("\t\tempty");
+        } else {
+            for (Seed seed : seeds) {
+                Log.i("\t\t" + seed);
+            }
         }
     }
 }
