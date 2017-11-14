@@ -1,8 +1,6 @@
 package cc.colorcat.jspider;
 
 
-import cc.colorcat.jspider.internal.Log;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +48,6 @@ final class RealCall implements Call {
             }
         } catch (Exception e) {
             reason = e;
-            Log.e(e);
         } finally {
             spider.dispatcher().finished(this, reason);
         }

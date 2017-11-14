@@ -24,7 +24,7 @@ public class Main {
     private static final File SAVE_DIR;
 
     static {
-        SAVE_DIR = new File("D:\\temp");
+        SAVE_DIR = new File("/Users/cxx/Pictures/spider");
 
         COOKIE_JAR = new CookieJar() {
             private Map<String, List<Cookie>> cookies = new ConcurrentHashMap<>();
@@ -56,7 +56,7 @@ public class Main {
                 .eventListener(new TestEventListener())
                 .connection(new OkConnection(CLIENT))
                 .seedJar(new TestSeedJar())
-                .maxDepth(5)
+                .maxDepth(2)
                 .build();
     }
 
