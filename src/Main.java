@@ -1,5 +1,4 @@
 import cc.colorcat.jspider.JSpider;
-import cc.colorcat.jspider.internal.Log;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
