@@ -5,6 +5,7 @@ import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
+import sun.security.provider.ConfigFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,10 +50,13 @@ public class Main {
         SPIDER = new JSpider.Builder()
 //                .addParser(new CoolapkParser())
                 .addParser(new BingPaper.BingParser())
+                .addParser(new SinaScoreRanking.Parser())
                 .registerHandler("image", new ImageHandler(new Downloader(CLIENT), SAVE_DIR))
                 .registerHandler("image", new BingPaper.BingHandler(new Downloader(CLIENT), SAVE_DIR))
+                .registerHandler(SinaScoreRanking.TAG, new SinaScoreRanking.Handler())
                 .eventListener(new LogListener())
                 .connection(new OkConnection(CLIENT))
+//                .connection(new HtmlUnitConnection())
                 .seedJar(new LogSeedJar())
                 .maxDepth(5)
                 .build();
@@ -67,10 +71,11 @@ public class Main {
     }
 
     private static void testJSpider() {
-        Map<String, String> def = new HashMap<>();
-        def.put("dir", "Bing");
+//        Map<String, String> def = new HashMap<>();
+//        def.put("dir", "Bing");
 //        SPIDER.start("image", "https://bing.ioliu.cn/", def);
-        SPIDER.start("image", "https://bing.ioliu.cn/ranking", def);
+//        SPIDER.start("image", "https://bing.ioliu.cn/ranking", def);
+        SPIDER.start(SinaScoreRanking.TAG, "http://sports.sina.com.cn/g/pl/table.html");
     }
 
 

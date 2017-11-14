@@ -1,7 +1,10 @@
 import cc.colorcat.spider.*;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by cxx on 2017/11/14.
@@ -9,16 +12,56 @@ import java.util.List;
  */
 public class SinaScoreRanking {
     public static final String TAG = "jfb";
-    public static final String HOST = "http://sports.sina.com.cn";
+    public static final String HOST = "sports.sina.com.cn";
 
     public static class Parser implements cc.colorcat.spider.Parser {
         @Override
         public List<Scrap> parse(Seed seed, WebSnapshot snapshot) {
             if (filter(seed)) {
-
+                List<Scrap> scraps = new LinkedList<>();
+                Document doc = Jsoup.parse(snapshot.resource(), seed.baseUrl());
+                Element jfb = doc.getElementById("jfb");
+                Scrap header = parseTableHeader(seed, jfb);
+                if (header != null) {
+                    scraps.add(header);
+                }
+                scraps.addAll(parseScoreRanking(seed, jfb));
+                return scraps;
             }
-
             return Collections.emptyList();
+        }
+
+        private static Scrap parseTableHeader(Seed seed, Element jfb) {
+            Element bg = jfb.selectFirst("tr.bg");
+            if (bg != null) {
+                Elements elements = bg.getElementsByTag("span");
+                Map<String, String> map = new HashMap<>();
+                for (int i = 0, size = elements.size(); i < size; i++) {
+                    map.put(Integer.toString(i), elements.get(i).text());
+                }
+                return seed.newScrapWithFill(map);
+            }
+            return null;
+        }
+
+        private static List<Scrap> parseScoreRanking(Seed seed, Element jfb) {
+            Elements trs = jfb.getElementsByTag("tr");
+            if (trs.get(0).hasClass("bg")) trs.remove(0);
+            List<Scrap> scraps = new LinkedList<>();
+            for (Element tr : trs) {
+                Elements td = tr.getElementsByTag("td");
+                Map<String, String> map = new HashMap<>();
+                for (int i = 0, size = td.size(); i < size; i++) {
+                    if (i == 0 || i == 1) {
+                        String text = td.get(i).child(0).text();
+                        map.put(String.valueOf(i), text);
+                    } else {
+                        map.put(String.valueOf(i), td.get(i).text());
+                    }
+                }
+                scraps.add(seed.newScrapWithFill(map));
+            }
+            return scraps;
         }
     }
 
@@ -26,7 +69,14 @@ public class SinaScoreRanking {
         @Override
         public boolean handle(Scrap scrap) {
             if (filter(scrap)) {
-                
+                Map<String, String> data = scrap.data();
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0, size = data.size(); i < size; i++) {
+                    if (i != 0) sb.append("\t");
+                    sb.append(data.get(String.valueOf(i)));
+                }
+                System.out.println(sb.toString());
+                return true;
             }
             return false;
         }
