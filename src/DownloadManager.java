@@ -34,23 +34,28 @@ class DownloadManager {
     }
 
     private void realDownload(Task task) {
-        client.newCall(new Request.Builder().url(task.url).get().build()).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                notifyTaskFinish(task, false);
-            }
+        client.newCall(new Request.Builder()
+                .url(task.url)
+                .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.16 Safari/537.36")
+                .get()
+                .build())
+                .enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        notifyTaskFinish(task, false);
+                    }
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                try {
-                    write(response, task.savePath);
-                    notifyTaskFinish(task, true);
-                } catch (IOException e) {
-                    notifyTaskFinish(task, false);
-                    throw e;
-                }
-            }
-        });
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        try {
+                            write(response, task.savePath);
+                            notifyTaskFinish(task, true);
+                        } catch (IOException e) {
+                            notifyTaskFinish(task, false);
+                            throw e;
+                        }
+                    }
+                });
     }
 
     private synchronized void notifyTaskFinish(Task task, boolean success) {

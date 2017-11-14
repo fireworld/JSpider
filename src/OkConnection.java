@@ -19,11 +19,6 @@ public class OkConnection implements Connection {
         this.client = client;
     }
 
-    private OkConnection(OkHttpClient client, WebSnapshot snapshot) {
-        this.client = client;
-        this.snapshot = snapshot;
-    }
-
     @Override
     public WebSnapshot get(URI uri) throws IOException {
         if (!Utils.isHttpUrl(uri)) {
@@ -36,7 +31,11 @@ public class OkConnection implements Connection {
     }
 
     private WebSnapshot doGet(URI uri) throws IOException {
-        Request request = new Request.Builder().url(uri.toString()).get().build();
+        Request request = new Request.Builder()
+                .url(uri.toString())
+                .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.16 Safari/537.36")
+                .get()
+                .build();
         Response response = client.newCall(request).execute();
         if (response.code() == 200) {
             ResponseBody body = response.body();

@@ -50,6 +50,7 @@ public class Main {
         SPIDER = new JSpider.Builder()
                 .addParser(new BingPaper.Parser())
                 .addParser(new SinaScoreRanking.Parser())
+                .addParser(new MmjpgPaper.Parser())
                 .registerHandler("image", new ImageHandler(new DownloadManager(CLIENT), SAVE_DIR))
                 .registerHandler("image", new BingPaper.Handler(new DownloadManager(CLIENT), SAVE_DIR))
                 .registerHandler(SinaScoreRanking.TAG, new SinaScoreRanking.Handler())
