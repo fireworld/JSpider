@@ -1,4 +1,4 @@
-package cc.colorcat.spider.internal;
+package cc.colorcat.jspider.internal;
 
 import java.io.*;
 import java.net.URI;
@@ -11,7 +11,6 @@ import java.util.*;
  */
 public final class Utils {
     public static final Charset UTF8 = Charset.forName("UTF-8");
-    private static final String REG_HTTP_URL = "^(http)(s)?://(.)+";
 
     public static File createSavePath(File directory, String folderName, String fileName) {
         File folder = directory;

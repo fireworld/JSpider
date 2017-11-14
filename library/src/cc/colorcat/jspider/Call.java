@@ -1,4 +1,4 @@
-package cc.colorcat.spider;
+package cc.colorcat.jspider;
 
 /**
  * Created by cxx on 17-11-9.

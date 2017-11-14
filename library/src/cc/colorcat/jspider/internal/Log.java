@@ -1,4 +1,4 @@
-package cc.colorcat.spider.internal;
+package cc.colorcat.jspider.internal;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

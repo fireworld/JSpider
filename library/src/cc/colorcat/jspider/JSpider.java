@@ -1,6 +1,6 @@
-package cc.colorcat.spider;
+package cc.colorcat.jspider;
 
-import cc.colorcat.spider.internal.Utils;
+import cc.colorcat.jspider.internal.Utils;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;

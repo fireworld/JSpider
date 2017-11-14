@@ -1,6 +1,7 @@
-package cc.colorcat.spider;
+package cc.colorcat.jspider;
 
-import cc.colorcat.spider.internal.Log;
+
+import cc.colorcat.jspider.internal.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package cc.colorcat.spider;
+package cc.colorcat.jspider;
 
 import java.net.URI;
 import java.util.Map;

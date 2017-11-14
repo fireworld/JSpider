@@ -1,6 +1,6 @@
-import cc.colorcat.spider.Connection;
-import cc.colorcat.spider.WebSnapshot;
-import cc.colorcat.spider.internal.Utils;
+import cc.colorcat.jspider.Connection;
+import cc.colorcat.jspider.WebSnapshot;
+import cc.colorcat.jspider.internal.Utils;
 import okhttp3.*;
 
 import java.io.IOException;
@@ -15,12 +15,7 @@ public class OkConnection implements Connection {
     private OkHttpClient client;
     private WebSnapshot snapshot;
 
-    public OkConnection() {
-        client = new OkHttpClient.Builder()
-                .build();
-    }
-
-    public OkConnection(OkHttpClient client) {
+    OkConnection(OkHttpClient client) {
         this.client = client;
     }
 

@@ -1,5 +1,7 @@
-import cc.colorcat.spider.*;
-import cc.colorcat.spider.internal.Utils;
+import cc.colorcat.jspider.Scrap;
+import cc.colorcat.jspider.Seed;
+import cc.colorcat.jspider.WebSnapshot;
+import cc.colorcat.jspider.internal.Utils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -15,11 +17,11 @@ import java.util.Map;
  * Created by cxx on ${DATA}.
  * xx.ch@outlook.com
  */
-public class BingPaper {
+class BingPaper {
     private static final String TAG = "image";
     private static final String HOST = "bing.ioliu.cn";
 
-    public static class BingParser implements Parser {
+    public static class Parser implements cc.colorcat.jspider.Parser {
         @Override
         public List<Scrap> parse(Seed seed, WebSnapshot snapshot) {
             if (filter(seed)) {
@@ -43,12 +45,12 @@ public class BingPaper {
         }
     }
 
-    public static class BingHandler implements Handler {
-        private final Downloader downloader;
+    public static class Handler implements cc.colorcat.jspider.Handler {
+        private final DownloadManager manager;
         private final File directory;
 
-        public BingHandler(Downloader downloader, File directory) {
-            this.downloader = downloader;
+        Handler(DownloadManager manager, File directory) {
+            this.manager = manager;
             this.directory = directory;
         }
 
@@ -67,7 +69,7 @@ public class BingPaper {
                     } else {
                         fileName = System.nanoTime() + ".jpg";
                     }
-                    downloader.download(url, Utils.createSavePath(directory, folderName, fileName));
+                    manager.download(url, Utils.createSavePath(directory, folderName, fileName));
                     return true;
                 }
             }

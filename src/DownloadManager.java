@@ -1,5 +1,5 @@
-import cc.colorcat.spider.internal.Log;
-import cc.colorcat.spider.internal.Utils;
+import cc.colorcat.jspider.internal.Log;
+import cc.colorcat.jspider.internal.Utils;
 import okhttp3.*;
 import okio.BufferedSink;
 import okio.BufferedSource;
@@ -14,21 +14,21 @@ import java.util.Map;
  * Created by cxx on 17-11-9.
  * xx.ch@outlook.com
  */
-public class Downloader {
+class DownloadManager {
     private static final int MAX_RETRY = 3;
     private final Map<String, Task> tasks = new HashMap<>();
     private final OkHttpClient client;
 
-    public Downloader(OkHttpClient client) {
+    DownloadManager(OkHttpClient client) {
         this.client = client;
     }
 
-    public void download(String url, File savePath) {
+    void download(String url, File savePath) {
         synchronized (tasks) {
             Task task = new Task(url, savePath);
             if (!tasks.containsKey(url)) {
                 tasks.put(url, task);
-                realDownload(new Task(url, savePath));
+                realDownload(task);
             }
         }
     }
@@ -37,7 +37,6 @@ public class Downloader {
         client.newCall(new Request.Builder().url(task.url).get().build()).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Log.e(e);
                 notifyTaskFinish(task, false);
             }
 
@@ -55,17 +54,15 @@ public class Downloader {
     }
 
     private synchronized void notifyTaskFinish(Task task, boolean success) {
-        String msg;
         if (!success) {
-            msg = "Download failed, url = ";
+            Log.w("Download failed, url = " + task.url);
             task.count++;
             if (task.count < MAX_RETRY) {
                 realDownload(task);
             }
         } else {
-            msg = "Download success, url = ";
+            Log.d("Download success, url = " + task.url);
         }
-        Log.w(msg + task.url);
     }
 
     private void write(Response response, File savePath) throws IOException {

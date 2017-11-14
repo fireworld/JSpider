@@ -1,4 +1,6 @@
-import cc.colorcat.spider.*;
+import cc.colorcat.jspider.Scrap;
+import cc.colorcat.jspider.Seed;
+import cc.colorcat.jspider.WebSnapshot;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -11,10 +13,10 @@ import java.util.*;
  * xx.ch@outlook.com
  */
 public class SinaScoreRanking {
-    public static final String TAG = "jfb";
-    public static final String HOST = "sports.sina.com.cn";
+    static final String TAG = "jfb";
+    private static final String HOST = "sports.sina.com.cn";
 
-    public static class Parser implements cc.colorcat.spider.Parser {
+    public static class Parser implements cc.colorcat.jspider.Parser {
         @Override
         public List<Scrap> parse(Seed seed, WebSnapshot snapshot) {
             if (filter(seed)) {
@@ -65,7 +67,7 @@ public class SinaScoreRanking {
         }
     }
 
-    public static class Handler implements cc.colorcat.spider.Handler {
+    public static class Handler implements cc.colorcat.jspider.Handler {
         @Override
         public boolean handle(Scrap scrap) {
             if (filter(scrap)) {
