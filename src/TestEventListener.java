@@ -6,7 +6,7 @@ import cc.colorcat.jspider.Seed;
  * Created by cxx on ${DATA}.
  * xx.ch@outlook.com
  */
-public class TestEventListener implements EventListener{
+public class TestEventListener implements EventListener {
     @Override
     public void onSuccess(Seed seed) {
 

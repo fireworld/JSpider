@@ -61,7 +61,7 @@ class DownloadManager {
                 realDownload(task);
             }
         } else {
-            Log.d("Download success, url = " + task.url);
+            Log.f("Download success, url = " + task.url);
         }
     }
 
