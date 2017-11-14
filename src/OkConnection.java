@@ -12,11 +12,8 @@ import java.nio.charset.Charset;
  * xx.ch@outlook.com
  */
 public class OkConnection implements Connection {
-    private static final String HTTP = "http";
-    private static final String HTTPS = "https";
     private OkHttpClient client;
     private WebSnapshot snapshot;
-    private URI uri;
 
     public OkConnection() {
         client = new OkHttpClient.Builder()
@@ -27,16 +24,19 @@ public class OkConnection implements Connection {
         this.client = client;
     }
 
+    private OkConnection(OkHttpClient client, WebSnapshot snapshot) {
+        this.client = client;
+        this.snapshot = snapshot;
+    }
+
     @Override
     public WebSnapshot get(URI uri) throws IOException {
-        String scheme = Utils.nullElse(uri.getScheme(), "").toLowerCase();
-        if (!HTTP.equals(scheme) && !HTTPS.equals(scheme)) {
+        if (!Utils.isHttpUrl(uri)) {
             throw new UnsupportedOperationException("Unsupported uri, uri = " + uri.toString());
         }
-        if (snapshot != null && snapshot.isSuccess() && uri.equals(this.uri)) {
+        if (snapshot != null && snapshot.isSuccess() && snapshot.uri().equals(uri)) {
             return snapshot;
         }
-        this.uri = uri;
         return this.snapshot = doGet(uri);
     }
 

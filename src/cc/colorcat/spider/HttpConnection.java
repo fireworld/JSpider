@@ -14,10 +14,7 @@ import java.nio.charset.Charset;
  * xx.ch@outlook.com
  */
 final class HttpConnection implements Connection {
-    private static final String HTTP = "http";
-    private static final String HTTPS = "https";
     private WebSnapshot snapshot;
-    private URI uri;
 
     HttpConnection() {
 
@@ -28,13 +25,11 @@ final class HttpConnection implements Connection {
         if (!Utils.isHttpUrl(uri)) {
             throw new UnsupportedOperationException("Unsupported uri, uri = " + uri.toString());
         }
-        if (snapshot != null && snapshot.isSuccess() && uri.equals(this.uri)) {
+        if (snapshot != null && snapshot.isSuccess() && snapshot.uri().equals(uri)) {
             return snapshot;
         }
-        this.uri = uri;
         return this.snapshot = onGet(uri);
     }
-
 
     private static WebSnapshot onGet(URI uri) throws IOException {
         HttpURLConnection conn = null;

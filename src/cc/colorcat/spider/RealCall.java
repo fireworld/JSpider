@@ -44,14 +44,9 @@ final class RealCall implements Call {
         Exception reason = null;
         try {
             List<? extends Seed> newSeeds = getScrapsWitInterceptorChain();
-//            if (!newSeeds.isEmpty()) {
-//                if (spider.depthFirst()) {
-//                    depthCrawl(newSeeds);
-//                } else {
-//                    breadthCrawl(newSeeds);
-//                }
-            spider.mapAndEnqueue(newSeeds);
-//            }
+            if (!newSeeds.isEmpty()) {
+                spider.mapAndEnqueue(newSeeds);
+            }
         } catch (Exception e) {
             reason = e;
             Log.e(e);
@@ -64,21 +59,6 @@ final class RealCall implements Call {
     public void run() {
         execute();
     }
-
-//    private void depthCrawl(List<? extends Seed> seeds) throws IOException {
-//        LinkedList<? extends Seed> newSeeds = new LinkedList<>(seeds);
-//        for (Seed seed = newSeeds.pollFirst(); seed != null; seed = newSeeds.pollFirst()) {
-//            RealCall call = new RealCall(spider, seed);
-//            if (spider.dispatcher().tryEnqueueRunning(call)) {
-//                call.execute();
-//            }
-//        }
-//    }
-//
-//    private void breadthCrawl(List<? extends Seed> seeds) {
-//        spider.dispatcher().enqueue(scraps);
-//        spider.mapAndEnqueue(seeds);
-//    }
 
     private List<Scrap> getScrapsWitInterceptorChain() throws IOException {
         incrementCount();
