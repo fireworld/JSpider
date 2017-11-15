@@ -7,8 +7,10 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="library" />
     <orderEntry type="library" name="com.squareup.okhttp3:okhttp:3.2.0" level="project" />
     <orderEntry type="library" name="org.jsoup:jsoup:1.11.1" level="project" />
-    <orderEntry type="module" module-name="library" />
+    <orderEntry type="library" name="org.seleniumhq.selenium:selenium-java:2.8.0" level="project" />
+    <orderEntry type="library" name="org.seleniumhq.selenium:selenium-htmlunit-driver:2.8.0" level="project" />
   </component>
 </module>

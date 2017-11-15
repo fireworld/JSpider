@@ -1,13 +1,22 @@
 import cc.colorcat.jspider.JSpider;
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.gargoylesoftware.htmlunit.BrowserVersionFeatures;
+import com.gargoylesoftware.htmlunit.Page;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.javascript.JavaScriptEngine;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.android.AndroidDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.html5.BrowserConnection;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -61,7 +70,15 @@ public class Main {
     }
 
     public static void main(String[] args) throws IOException {
-        testJSpider();
+        String url = "http://sports.sina.com.cn/g/pl/table.html";
+        HtmlUnitDriver driver = createDriver();
+        driver.get(url);
+        System.out.println(driver.getPageSource());
+
+//        WebClient client = createWebClient();
+//        Page page = client.getPage(url);
+//        System.out.println(page.getWebResponse().getContentAsString());
+//        testJSpider();
     }
 
     private static void testJSpider() {
@@ -70,5 +87,18 @@ public class Main {
 //        SPIDER.start("image", "https://bing.ioliu.cn/", def);
 //        SPIDER.start("image", "https://bing.ioliu.cn/ranking", def);
         SPIDER.start(SinaScoreRanking.TAG, "http://sports.sina.com.cn/g/pl/table.html");
+    }
+
+    private static WebClient createWebClient() {
+        WebClient client = new WebClient(BrowserVersion.FIREFOX_3_6);
+        client.setJavaScriptEnabled(true);
+        client.setJavaScriptTimeout(10000);
+        return client;
+    }
+
+    private static HtmlUnitDriver createDriver() {
+        HtmlUnitDriver driver = new HtmlUnitDriver(BrowserVersion.FIREFOX_3_6);
+        driver.setJavascriptEnabled(true);
+        return driver;
     }
 }
