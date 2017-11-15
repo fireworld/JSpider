@@ -1,12 +1,9 @@
 import cc.colorcat.jspider.JSpider;
-import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.WebClient;
 import download.FileUtils;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
 import java.io.File;
 import java.io.IOException;
@@ -87,16 +84,16 @@ public class Main {
         SPIDER.restartWithSeedJar();
     }
 
-    private static WebClient createWebClient() {
-        WebClient client = new WebClient(BrowserVersion.FIREFOX_3_6);
-        client.setJavaScriptEnabled(true);
-        client.setJavaScriptTimeout(10000);
-        return client;
-    }
-
-    private static HtmlUnitDriver createDriver() {
-        HtmlUnitDriver driver = new HtmlUnitDriver(BrowserVersion.FIREFOX_3_6);
-        driver.setJavascriptEnabled(true);
-        return driver;
-    }
+//    private static WebClient createWebClient() {
+//        WebClient client = new WebClient(BrowserVersion.FIREFOX_3_6);
+//        client.setJavaScriptEnabled(true);
+//        client.setJavaScriptTimeout(10000);
+//        return client;
+//    }
+//
+//    private static HtmlUnitDriver createDriver() {
+//        HtmlUnitDriver driver = new HtmlUnitDriver(BrowserVersion.FIREFOX_3_6);
+//        driver.setJavascriptEnabled(true);
+//        return driver;
+//    }
 }

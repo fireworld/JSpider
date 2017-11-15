@@ -1,11 +1,9 @@
 package download;
 
-import cc.colorcat.jspider.EventListener;
 import cc.colorcat.jspider.internal.Log;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Created by cxx on 17-11-15.
@@ -51,8 +49,7 @@ public class DownloadManager {
     }
 
     private void realEnqueue(Request request) {
-        downloader.request(request)
-                .go(listener);
+        downloader.clone().request(request).go(listener);
     }
 
     private void notifyRequestRemoved() {

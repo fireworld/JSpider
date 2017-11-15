@@ -6,6 +6,8 @@ import okhttp3.*;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by cxx on 17-11-9.
@@ -31,12 +33,11 @@ public class OkConnection implements Connection {
     }
 
     private WebSnapshot doGet(URI uri) throws IOException {
-        Request request = new Request.Builder()
+        Request.Builder builder = new Request.Builder()
                 .url(uri.toString())
-                .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.16 Safari/537.36")
-                .get()
-                .build();
-        Response response = client.newCall(request).execute();
+                .get();
+        addHeader(builder, uri);
+        Response response = client.newCall(builder.build()).execute();
         if (response.code() == 200) {
             ResponseBody body = response.body();
             if (body != null) {
@@ -50,6 +51,17 @@ public class OkConnection implements Connection {
             }
         }
         return WebSnapshot.newFailed(uri);
+    }
+
+    private static void addHeader(Request.Builder builder, URI uri) {
+        Map<String, List<String>> headers = BrowserVersion.CHROME.headers();
+        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+            String key = entry.getKey();
+            for (String value : entry.getValue()) {
+                builder.addHeader(key, value);
+            }
+        }
+        builder.addHeader("Host", uri.getHost());
     }
 
     @SuppressWarnings("CloneDoesntCallSuperClone")
