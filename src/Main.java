@@ -1,22 +1,17 @@
 import cc.colorcat.jspider.JSpider;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.BrowserVersionFeatures;
-import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.javascript.JavaScriptEngine;
+import download.FileUtils;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.android.AndroidDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.html5.BrowserConnection;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,7 +28,7 @@ public class Main {
     private static final File SAVE_DIR;
 
     static {
-        SAVE_DIR = new File("/Users/cxx/Pictures/spider");
+        SAVE_DIR = new File("/home/cxx/图片/Spider");
 
         COOKIE_JAR = new CookieJar() {
             private Map<String, List<Cookie>> cookies = new ConcurrentHashMap<>();
@@ -70,23 +65,26 @@ public class Main {
     }
 
     public static void main(String[] args) throws IOException {
-        String url = "http://sports.sina.com.cn/g/pl/table.html";
-        HtmlUnitDriver driver = createDriver();
-        driver.get(url);
-        System.out.println(driver.getPageSource());
+//        String url = "http://sports.sina.com.cn/g/pl/table.html";
+//        HtmlUnitDriver driver = createDriver();
+//        driver.get(url);
+//        System.out.println(driver.getPageSource());
 
 //        WebClient client = createWebClient();
 //        Page page = client.getPage(url);
 //        System.out.println(page.getWebResponse().getContentAsString());
 //        testJSpider();
+        System.out.println(FileUtils.USER_HOME);
+        System.out.println(FileUtils.createDirWithinDownload("TestRoot", "Test1", "Test2"));
     }
 
     private static void testJSpider() {
-//        Map<String, String> def = new HashMap<>();
-//        def.put("dir", "Bing");
+        Map<String, String> def = new HashMap<>();
+        def.put("dir", "Bing");
 //        SPIDER.start("image", "https://bing.ioliu.cn/", def);
+//        SPIDER.start(SinaScoreRanking.TAG, "http://sports.sina.com.cn/g/pl/table.html");
 //        SPIDER.start("image", "https://bing.ioliu.cn/ranking", def);
-        SPIDER.start(SinaScoreRanking.TAG, "http://sports.sina.com.cn/g/pl/table.html");
+        SPIDER.restartWithSeedJar();
     }
 
     private static WebClient createWebClient() {
