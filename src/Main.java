@@ -65,10 +65,10 @@ public class Main {
     }
 
     private static void testJSpider() {
-        Map<String, String> def = new HashMap<>();
-        def.put("dir", "Bing");
+//        Map<String, String> def = new HashMap<>();
+//        def.put("dir", "Bing");
 //        SPIDER.start("image", "https://bing.ioliu.cn/", def);
-        SPIDER.start("image", "https://bing.ioliu.cn/ranking", def);
-//        SPIDER.start(SinaScoreRanking.TAG, "http://sports.sina.com.cn/g/pl/table.html");
+//        SPIDER.start("image", "https://bing.ioliu.cn/ranking", def);
+        SPIDER.start(SinaScoreRanking.TAG, "http://sports.sina.com.cn/g/pl/table.html");
     }
 }
