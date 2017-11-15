@@ -4,7 +4,7 @@ package download;
  * Created by cxx on 17-11-15.
  * xx.ch@outlook.com
  */
-enum Method {
+public enum Method {
     GET, HEAD, TRACE, OPTIONS, POST, PUT, DELETE;
 
     public boolean needBody() {

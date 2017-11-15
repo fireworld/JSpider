@@ -103,6 +103,7 @@ public class DownloadManager {
             if (listener != null) {
                 listener.onAllFinished(success, failure);
             }
+            Log.i("All download finished!");
         }
     }
 

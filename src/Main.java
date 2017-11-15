@@ -1,5 +1,5 @@
 import cc.colorcat.jspider.JSpider;
-import download.FileUtils;
+import download.DownloadManager;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
@@ -8,9 +8,9 @@ import okhttp3.OkHttpClient;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -22,10 +22,11 @@ public class Main {
     private static final CookieJar COOKIE_JAR;
     private static final OkHttpClient CLIENT;
     private static final JSpider SPIDER;
-    private static final File SAVE_DIR;
+    public static final File SAVE_DIR;
+    private static final DownloadManager MANAGER;
 
     static {
-        SAVE_DIR = new File("/home/cxx/图片/Spider");
+        SAVE_DIR = new File("");
 
         COOKIE_JAR = new CookieJar() {
             private Map<String, List<Cookie>> cookies = new ConcurrentHashMap<>();
@@ -48,52 +49,31 @@ public class Main {
                 .readTimeout(10, TimeUnit.SECONDS)
                 .build();
 
+        MANAGER = DownloadManager.create(new OkDownloader(CLIENT), 3);
+
         SPIDER = new JSpider.Builder()
                 .addParser(new BingPaper.Parser())
                 .addParser(new SinaScoreRanking.Parser())
-                .registerHandler("image", new ImageHandler(new DownloadManager(CLIENT), SAVE_DIR))
-                .registerHandler("image", new BingPaper.Handler(new DownloadManager(CLIENT), SAVE_DIR))
+                .registerHandler("image", new ImageHandler(MANAGER, SAVE_DIR))
+                .registerHandler("image", new BingPaper.Handler(MANAGER, SAVE_DIR))
                 .registerHandler(SinaScoreRanking.TAG, new SinaScoreRanking.Handler())
                 .eventListener(new TestEventListener())
                 .connection(new OkConnection(CLIENT))
                 .seedJar(new TestSeedJar())
-                .maxDepth(2)
+                .maxDepth(100)
                 .build();
     }
 
     public static void main(String[] args) throws IOException {
-//        String url = "http://sports.sina.com.cn/g/pl/table.html";
-//        HtmlUnitDriver driver = createDriver();
-//        driver.get(url);
-//        System.out.println(driver.getPageSource());
-
-//        WebClient client = createWebClient();
-//        Page page = client.getPage(url);
-//        System.out.println(page.getWebResponse().getContentAsString());
-//        testJSpider();
-        System.out.println(FileUtils.USER_HOME);
-        System.out.println(FileUtils.createDirWithinDownload("TestRoot", "Test1", "Test2"));
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Input url: ");
+        String url = scanner.next();
+        testJSpider(url.trim());
     }
 
-    private static void testJSpider() {
-        Map<String, String> def = new HashMap<>();
-        def.put("dir", "Bing");
-//        SPIDER.start("image", "https://bing.ioliu.cn/", def);
-//        SPIDER.start(SinaScoreRanking.TAG, "http://sports.sina.com.cn/g/pl/table.html");
+    private static void testJSpider(String url) {
+        SPIDER.start("image", url);
 //        SPIDER.start("image", "https://bing.ioliu.cn/ranking", def);
-        SPIDER.restartWithSeedJar();
+//        SPIDER.restartWithSeedJar();
     }
-
-//    private static WebClient createWebClient() {
-//        WebClient client = new WebClient(BrowserVersion.FIREFOX_3_6);
-//        client.setJavaScriptEnabled(true);
-//        client.setJavaScriptTimeout(10000);
-//        return client;
-//    }
-//
-//    private static HtmlUnitDriver createDriver() {
-//        HtmlUnitDriver driver = new HtmlUnitDriver(BrowserVersion.FIREFOX_3_6);
-//        driver.setJavascriptEnabled(true);
-//        return driver;
-//    }
 }

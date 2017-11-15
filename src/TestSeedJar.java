@@ -1,16 +1,13 @@
 import cc.colorcat.jspider.Seed;
 import cc.colorcat.jspider.SeedJar;
 import cc.colorcat.jspider.internal.Log;
-import cc.colorcat.jspider.internal.Utils;
 import com.google.gson.reflect.TypeToken;
 import okio.Okio;
 
-import java.io.*;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -19,7 +16,7 @@ import java.util.stream.Stream;
  * xx.ch@outlook.com
  */
 public class TestSeedJar implements SeedJar {
-    private static final File savePath = new File("/home/cxx/图片/Spider/SeedJar.data");
+    private static final File savePath = new File(Main.SAVE_DIR, "SeedJar.data");
 
     @Override
     public void save(List<Seed> success, List<Seed> failed, List<Seed> reachedMaxDepth) {
@@ -65,7 +62,8 @@ public class TestSeedJar implements SeedJar {
     private static List<Seed> read() {
         try {
             String json = Okio.buffer(Okio.source(savePath)).readUtf8();
-            return JsonUtils.fromJson(json, new TypeToken<List<Seed>>() {}.getType());
+            return JsonUtils.fromJson(json, new TypeToken<List<Seed>>() {
+            }.getType());
         } catch (IOException e) {
             Log.e(e);
             return Collections.emptyList();

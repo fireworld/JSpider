@@ -2,6 +2,8 @@ import cc.colorcat.jspider.Scrap;
 import cc.colorcat.jspider.Seed;
 import cc.colorcat.jspider.WebSnapshot;
 import cc.colorcat.jspider.internal.Utils;
+import download.DownloadManager;
+import download.Request;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -69,7 +71,7 @@ class BingPaper {
                     } else {
                         fileName = System.nanoTime() + ".jpg";
                     }
-                    manager.download(url, Utils.createSavePath(directory, folderName, fileName));
+                    manager.enqueue(Request.create(url, Utils.createSavePath(directory, folderName, fileName)));
                     return true;
                 }
             }

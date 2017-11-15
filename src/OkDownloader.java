@@ -1,13 +1,15 @@
 import download.Downloader;
-import download.FileUtils;
 import download.Request;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
+import okio.BufferedSink;
+import okio.BufferedSource;
+import okio.Okio;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +36,7 @@ public class OkDownloader implements Downloader {
         okhttp3.Request.Builder builder = new okhttp3.Request.Builder()
                 .url(request.url())
                 .get();
-        addHeader(builder, URI.create(request.url()));
+        addHeader(builder, URI.create(request.url()), request.headers());
         client.newCall(builder.build()).enqueue(new okhttp3.Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -44,7 +46,10 @@ public class OkDownloader implements Downloader {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 try {
-                    FileUtils.dumpAndClose(response.body().byteStream(), new FileOutputStream(request.savePath()));
+                    BufferedSink sink = Okio.buffer(Okio.sink(request.savePath()));
+                    BufferedSource source = Okio.buffer(Okio.source(response.body().byteStream()));
+                    sink.writeAll(source);
+                    sink.flush();
                     callback.onSuccess(request);
                 } catch (IOException e) {
                     callback.onFailure(request, e);
@@ -59,8 +64,9 @@ public class OkDownloader implements Downloader {
         return new OkDownloader(client);
     }
 
-    private static void addHeader(okhttp3.Request.Builder builder, URI uri) {
-        Map<String, List<String>> headers = BrowserVersion.CHROME.headers();
+    private static void addHeader(okhttp3.Request.Builder builder, URI uri, Map<String, List<String>> map) {
+        Map<String, List<String>> headers = new HashMap<>(map);
+        headers.putAll(BrowserVersion.CHROME.headers());
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
             String key = entry.getKey();
             for (String value : entry.getValue()) {
