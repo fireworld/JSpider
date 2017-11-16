@@ -1,5 +1,6 @@
 package cc.colorcat.jspider.test;
 
+import cc.colorcat.jspider.internal.UserAgent;
 import cc.colorcat.jspider.test.download.Downloader;
 import cc.colorcat.jspider.test.download.Task;
 import okhttp3.*;
@@ -34,6 +35,7 @@ public class OkDownloader implements Downloader {
         Request request = new okhttp3.Request.Builder()
                 .url(task.uri().toString())
                 .headers(of(task.headers()))
+                .header(UserAgent.NAME, UserAgent.Value.CHROME_MAC)
                 .get()
                 .build();
         client.newCall(request).enqueue(new okhttp3.Callback() {

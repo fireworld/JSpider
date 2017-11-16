@@ -26,7 +26,7 @@ class ImageHandler implements Handler {
     @Override
     public boolean handle(Scrap scrap) {
         Map<String, String> data = scrap.data();
-        String url = data.get("uri");
+        String url = data.get("url");
         if (url != null && url.matches("^(http)(s)?://(.)*\\.(jpg|png|jpeg)$")) {
             String folderName = data.get("dir");
             String fileName = url.substring(url.lastIndexOf('/') + 1, url.length());

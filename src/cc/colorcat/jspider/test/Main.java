@@ -6,17 +6,10 @@ import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -32,7 +25,7 @@ public class Main {
     private static final DownloadManager MANAGER;
 
     static {
-        SAVE_DIR = new File("/home/cxx/图片/Spider/hd");
+        SAVE_DIR = new File("/Users/cxx/Pictures/Spider");
 
         COOKIE_JAR = new CookieJar() {
             private Map<String, List<Cookie>> cookies = new ConcurrentHashMap<>();
@@ -61,13 +54,14 @@ public class Main {
                 .addParser(new BingPaper.Parser())
                 .addParser(new SinaScoreRanking.Parser())
                 .addParser(new HdWallpaper.Parser())
+                .addParser(new ZhuoKuPaper.Parser())
                 .registerHandler("image", new ImageHandler(MANAGER, SAVE_DIR))
                 .registerHandler("image", new BingPaper.Handler(MANAGER, SAVE_DIR))
                 .registerHandler(SinaScoreRanking.TAG, new SinaScoreRanking.Handler())
                 .eventListener(new TestEventListener())
                 .connection(new OkConnection(CLIENT))
                 .seedJar(new TestSeedJar())
-                .maxDepth(1)
+                .maxDepth(100)
                 .build();
     }
 
@@ -75,7 +69,9 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Input uri: ");
         String uri = scanner.next();
-        testJSpider(uri.trim());
+        System.out.print("Input folder name: ");
+        String folder = scanner.next();
+        testJSpider(uri.trim(), folder);
 //        System.out.println(System.getProperties());
 //        Document doc = Jsoup.connect("https://www.hdwallpapers.in/lionel_messi_fc_barcelona_hd_4k-wallpapers.html").get();
 //        Elements elements = doc.select("div.pagination > span.selected + a[href^=/]");
@@ -83,8 +79,20 @@ public class Main {
 //        images.forEach(e -> System.out.println(e.attr("href")));
     }
 
-    private static void testJSpider(String url) {
-        SPIDER.start("image", url);
+    private static void testJSpider(String url, String folder) {
+//        if (url.trim().toLowerCase().equals("q")) {
+//            SPIDER.startWithSeedJar(Collections.emptyList());
+//        } else {
+//            SPIDER.startWithSeedJar(Collections.singletonList(Seed.newSeed("image", url)));
+//        }
+        Map<String, String> map;
+        if (folder.trim().toLowerCase().equals("q")) {
+            map = Collections.emptyMap();
+        } else {
+            map = new HashMap<>();
+            map.put("dir", folder);
+        }
+        SPIDER.start("image", url, map);
 //        SPIDER.start("image", "https://bing.ioliu.cn/ranking", def);
 //        SPIDER.restartWithSeedJar();
     }

@@ -36,7 +36,7 @@ class BingPaper {
                 for (Element element : elements) {
                     String href = element.attr("href");
                     String url = seed.newUriWithJoin(href);
-                    Scrap scrap = seed.newScrapWithFill("uri", url);
+                    Scrap scrap = seed.newScrapWithFill("url", url);
                     scraps.add(scrap);
                 }
                 Element element = doc.select("a[href~=/(.)*\\?p=(\\d)+]").last();
@@ -63,7 +63,7 @@ class BingPaper {
         public boolean handle(Scrap scrap) {
             if (filter(scrap)) {
                 Map<String, String> data = scrap.data();
-                String url = data.get("uri");
+                String url = data.get("url");
                 if (url != null && url.matches("^(http)(s)?://(.)*(force=download)$")) {
                     String folderName = Utils.nullElse(data.get("dir"), "Bing");
                     String fileName;

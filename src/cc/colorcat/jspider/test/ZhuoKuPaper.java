@@ -12,31 +12,27 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by cxx on 17-11-16.
+ * Created by cxx on ${DATA}.
  * xx.ch@outlook.com
  */
-public class HdWallpaper {
+public class ZhuoKuPaper {
     private static final String TAG = "image";
-    private static final String HOST = "www.hdwallpapers.in";
+    private static final String HOST = "zhuoku.com";
 
     public static class Parser implements cc.colorcat.jspider.Parser {
+
         @Override
         public List<Scrap> parse(Seed seed, WebSnapshot snapshot) {
             if (filter(seed)) {
                 List<Scrap> scraps = new LinkedList<>();
-
-                // find image's detail page
                 Document doc = Jsoup.parse(snapshot.resource(), seed.baseUrl());
-                Elements detail = doc.select("ul.wallpapers a[href$=.html]");
-                detail.forEach(e -> scraps.add(seed.newScrapWithJoin(e.attr("href"))));
 
-                // find next page
-                Elements next = doc.select("div.pagination > span.selected + a[href^=/]");
-                next.forEach(e -> scraps.add(seed.newScrapWithJoin(e.attr("href"))));
+                Elements images = doc.select("img#imageview[src~=^(http)(s)?://(.)*\\.(jpg|png|jpeg)$]");
+                images.forEach(e -> scraps.add(seed.newScrapWithFill("url", e.attr("src"))));
 
-                // find image url
-                Elements images = doc.select("div.thumbbg1 a[href~=^(/)(.)*\\.(jpg|png|jpeg)][target=_blank]");
-                images.forEach(e -> scraps.add(seed.newScrapWithFill("url", seed.newUriWithJoin(e.attr("href")))));
+                Elements nextPages = doc.select("div#bizhi a[href$=.htm]");
+                nextPages.forEach(e -> scraps.add(seed.newScrapWithJoin(e.attr("href"))));
+
                 return scraps;
             }
             return Collections.emptyList();
@@ -44,6 +40,6 @@ public class HdWallpaper {
     }
 
     private static boolean filter(Seed seed) {
-        return TAG.equals(seed.tag()) && HOST.equals(seed.uri().getHost());
+        return TAG.equals(seed.tag()) && seed.uri().getHost().contains(HOST);
     }
 }
