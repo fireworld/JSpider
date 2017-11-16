@@ -69,9 +69,6 @@ public class Main {
 //        System.out.print("Input url: ");
 //        String url = scanner.next();
 //        testJSpider(url.trim());
-        List<String> a = Arrays.asList("aa", "ab", "ac", "ad");
-        List<String> b = Arrays.asList("ba", "bb", "bc", "bd");
-        System.out.println(Stream.concat(a.stream(), b.stream()).collect(Collectors.toList()));
     }
 
     private static void testJSpider(String url) {
