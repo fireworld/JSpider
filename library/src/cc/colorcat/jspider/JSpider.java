@@ -7,6 +7,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by cxx on 17-11-9.
@@ -109,17 +111,18 @@ public class JSpider implements Call.Factory {
     }
 
     public void start(List<Seed> seeds) {
-        if (seeds == null) {
-            throw new NullPointerException("sees == null");
-        }
         mapAndEnqueue(seeds);
     }
 
-    public void restartWithSeedJar() {
-        List<Seed> seeds = seedJar.load();
-        if (!seeds.isEmpty()) {
-            mapAndEnqueue(seeds);
-        }
+    public void startWithSeedJar() {
+        startWithSeedJar(Collections.emptyList());
+    }
+
+    public void startWithSeedJar(List<Seed> seeds) {
+        mapAndEnqueue(Stream
+                .concat(seeds.stream(), seedJar.load().stream())
+                .collect(Collectors.toList())
+        );
     }
 
     void mapAndEnqueue(List<? extends Seed> seeds) {

@@ -18,6 +18,10 @@ public class Seed {
     final int depth;
     final Map<String, String> data;
 
+    public static List<Seed> newSeeds(String tag, String uri) {
+        return newSeeds(tag, Collections.singletonList(uri));
+    }
+
     public static List<Seed> newSeeds(String tag, List<String> uris) {
         return newSeeds(tag, uris, 0, Collections.emptyMap());
     }

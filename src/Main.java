@@ -7,12 +7,12 @@ import okhttp3.OkHttpClient;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by cxx on 17-11-9.
@@ -65,10 +65,13 @@ public class Main {
     }
 
     public static void main(String[] args) throws IOException {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Input url: ");
-        String url = scanner.next();
-        testJSpider(url.trim());
+//        Scanner scanner = new Scanner(System.in);
+//        System.out.print("Input url: ");
+//        String url = scanner.next();
+//        testJSpider(url.trim());
+        List<String> a = Arrays.asList("aa", "ab", "ac", "ad");
+        List<String> b = Arrays.asList("ba", "bb", "bc", "bd");
+        System.out.println(Stream.concat(a.stream(), b.stream()).collect(Collectors.toList()));
     }
 
     private static void testJSpider(String url) {
