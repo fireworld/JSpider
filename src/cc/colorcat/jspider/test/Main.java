@@ -72,11 +72,6 @@ public class Main {
         System.out.print("Input folder name: ");
         String folder = scanner.next();
         testJSpider(uri.trim(), folder);
-//        System.out.println(System.getProperties());
-//        Document doc = Jsoup.connect("https://www.hdwallpapers.in/lionel_messi_fc_barcelona_hd_4k-wallpapers.html").get();
-//        Elements elements = doc.select("div.pagination > span.selected + a[href^=/]");
-//        Elements images = doc.select("div.thumbbg1 a[href~=^(/)(.)*\\.(jpg|png|jpeg)][target=_blank]");
-//        images.forEach(e -> System.out.println(e.attr("href")));
     }
 
     private static void testJSpider(String url, String folder) {

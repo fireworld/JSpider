@@ -8,6 +8,7 @@ import cc.colorcat.jspider.test.download.FileUtils;
 import cc.colorcat.jspider.test.download.Task;
 
 import java.io.File;
+import java.net.URI;
 import java.util.Map;
 
 /**
@@ -25,17 +26,20 @@ class ImageHandler implements Handler {
 
     @Override
     public boolean handle(Scrap scrap) {
-        Map<String, String> data = scrap.data();
-        String url = data.get("url");
-        if (url != null && url.matches("^(http)(s)?://(.)*\\.(jpg|png|jpeg)$")) {
-            String folderName = data.get("dir");
-            String fileName = url.substring(url.lastIndexOf('/') + 1, url.length());
-            File savePath = FileUtils.createSavePath(directory, folderName, fileName);
-            manager.enqueue(Task.create(url, savePath)
-                    .header("Referer", scrap.uri().toString())
-                    .header(UserAgent.NAME, UserAgent.Value.CHROME_MAC)
-            );
-            return true;
+        if ("image".equals(scrap.tag())) {
+            Map<String, String> data = scrap.data();
+            String url = data.get("url");
+            if (url != null && url.matches("^(http)(s)?://(.)*\\.(jpg|png|jpeg)$")) {
+                String folderName = data.get("dir");
+                String fileName = url.substring(url.lastIndexOf('/') + 1, url.length());
+                File savePath = FileUtils.createSavePath(directory, folderName, fileName);
+                manager.enqueue(Task.create(url, savePath)
+                        .header("Host", URI.create(url).getHost())
+                        .header("Referer", scrap.uri().toString())
+                        .header(UserAgent.NAME, UserAgent.Value.CHROME_MAC)
+                );
+                return true;
+            }
         }
         return false;
     }
