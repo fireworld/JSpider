@@ -1,3 +1,5 @@
+package cc.colorcat.jspider.test;
+
 import cc.colorcat.jspider.Seed;
 import cc.colorcat.jspider.SeedJar;
 import cc.colorcat.jspider.internal.Log;
@@ -12,7 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Created by cxx on ${DATA}.
+ * Created by cxx on 2017/11/14.
  * xx.ch@outlook.com
  */
 public class TestSeedJar implements SeedJar {

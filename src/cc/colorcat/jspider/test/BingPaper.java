@@ -1,9 +1,12 @@
+package cc.colorcat.jspider.test;
+
 import cc.colorcat.jspider.Scrap;
 import cc.colorcat.jspider.Seed;
 import cc.colorcat.jspider.WebSnapshot;
 import cc.colorcat.jspider.internal.Utils;
-import download.DownloadManager;
-import download.Request;
+import cc.colorcat.jspider.test.download.DownloadManager;
+import cc.colorcat.jspider.test.download.FileUtils;
+import cc.colorcat.jspider.test.download.Task;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -16,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by cxx on ${DATA}.
+ * Created by cxx on 2017/11/13.
  * xx.ch@outlook.com
  */
 class BingPaper {
@@ -29,11 +32,11 @@ class BingPaper {
             if (filter(seed)) {
                 List<Scrap> scraps = new LinkedList<>();
                 Document doc = Jsoup.parse(snapshot.resource(), seed.baseUrl());
-                Elements elements = doc.select("a[class='ctrl download'][href~=^(/photo/)(.)*(force=download)$][target='_blank'][rel=nofollow]");
+                Elements elements = doc.select("a[class='ctrl cc.colorcat.jspider.test.download'][href~=^(/photo/)(.)*(force=cc.colorcat.jspider.test.download)$][target='_blank'][rel=nofollow]");
                 for (Element element : elements) {
                     String href = element.attr("href");
                     String url = seed.newUriWithJoin(href);
-                    Scrap scrap = seed.newScrapWithFill("url", url);
+                    Scrap scrap = seed.newScrapWithFill("uri", url);
                     scraps.add(scrap);
                 }
                 Element element = doc.select("a[href~=/(.)*\\?p=(\\d)+]").last();
@@ -60,7 +63,7 @@ class BingPaper {
         public boolean handle(Scrap scrap) {
             if (filter(scrap)) {
                 Map<String, String> data = scrap.data();
-                String url = data.get("url");
+                String url = data.get("uri");
                 if (url != null && url.matches("^(http)(s)?://(.)*(force=download)$")) {
                     String folderName = Utils.nullElse(data.get("dir"), "Bing");
                     String fileName;
@@ -71,7 +74,7 @@ class BingPaper {
                     } else {
                         fileName = System.nanoTime() + ".jpg";
                     }
-                    manager.enqueue(Request.create(url, Utils.createSavePath(directory, folderName, fileName)));
+                    manager.enqueue(Task.create(url, FileUtils.createSavePath(directory, folderName, fileName)));
                     return true;
                 }
             }

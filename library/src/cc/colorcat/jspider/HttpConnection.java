@@ -11,7 +11,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 
 /**
- * Created by cxx on ${DATA}.
+ * Created by cxx on 2017/11/11.
  * xx.ch@outlook.com
  */
 final class HttpConnection implements Connection {

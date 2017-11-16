@@ -1,3 +1,5 @@
+package cc.colorcat.jspider.test;
+
 import cc.colorcat.jspider.Scrap;
 import cc.colorcat.jspider.Seed;
 import cc.colorcat.jspider.WebSnapshot;

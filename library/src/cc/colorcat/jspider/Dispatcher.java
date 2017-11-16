@@ -1,7 +1,5 @@
 package cc.colorcat.jspider;
 
-import cc.colorcat.jspider.internal.Log;
-
 import java.net.URI;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -66,17 +64,17 @@ final class Dispatcher {
         URI uri = seed.uri();
         removeByUri(running, uri);
         if (reason == null) {
-            finished.add(call);
+            finished.add(call); // successful
             promoteCalls();
-        } else if (call.count() < spider.maxTry()) {
-            enqueue(Collections.singletonList(call), spider.depthFirst());
         } else {
-            call.incrementCount(); // for judging the executing result of call
-            finished.add(call);
-            promoteCalls();
+            call.incrementRetryCount();
+            if (call.retryCount() <= spider.maxRetry()) {
+                enqueue(Collections.singletonList(call), spider.depthFirst()); // retry
+            } else {
+                finished.add(call); // failed
+                promoteCalls();
+            }
         }
-        Log.i("running size = " + running.size());
-        Log.i("waiting size = " + waiting.size());
         if (reason == null) {
             spider.listener().onSuccess(seed);
         } else {
@@ -100,7 +98,7 @@ final class Dispatcher {
         List<Seed> failed = new ArrayList<>();
         for (Call call : finished) {
             Seed seed = call.seed();
-            if (call.count() > spider.maxTry()) {
+            if (call.retryCount() > spider.maxRetry()) {
                 failed.add(seed);
             } else {
                 success.add(seed);

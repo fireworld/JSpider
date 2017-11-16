@@ -14,7 +14,7 @@ final class RealCall implements Call {
     private final Seed seed;
     private final Connection connection;
     private final Parser parser;
-    private int count = 0;
+    private int retryCount = 0;
 
     RealCall(JSpider spider, Seed seed) {
         this.spider = spider;
@@ -24,13 +24,13 @@ final class RealCall implements Call {
     }
 
     @Override
-    public synchronized int count() {
-        return count;
+    public synchronized int retryCount() {
+        return retryCount;
     }
 
     @Override
-    public synchronized void incrementCount() {
-        ++count;
+    public synchronized void incrementRetryCount() {
+        ++retryCount;
     }
 
     @Override
@@ -59,7 +59,6 @@ final class RealCall implements Call {
     }
 
     private List<Scrap> getScrapsWitInterceptorChain() throws IOException {
-        incrementCount();
         List<Interceptor> users = spider.interceptors();
         List<Interceptor> interceptors = new ArrayList<>(users.size() + 3);
         interceptors.add(new SeedsCleanerInterceptor(spider));

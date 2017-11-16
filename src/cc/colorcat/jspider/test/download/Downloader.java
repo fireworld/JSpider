@@ -1,4 +1,4 @@
-package download;
+package cc.colorcat.jspider.test.download;
 
 /**
  * Created by cxx on 17-11-15.
@@ -6,7 +6,7 @@ package download;
  */
 public interface Downloader extends Cloneable {
 
-    Downloader request(Request request);
+    Downloader task(Task task);
 
     void go(Callback callback);
 
@@ -14,8 +14,8 @@ public interface Downloader extends Cloneable {
 
     interface Callback {
 
-        void onSuccess(Request request);
+        void onSuccess(Task task);
 
-        void onFailure(Request request, Exception reason);
+        void onFailure(Task task, Exception reason);
     }
 }

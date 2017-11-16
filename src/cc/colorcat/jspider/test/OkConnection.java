@@ -1,5 +1,8 @@
+package cc.colorcat.jspider.test;
+
 import cc.colorcat.jspider.Connection;
 import cc.colorcat.jspider.WebSnapshot;
+import cc.colorcat.jspider.internal.UserAgent;
 import cc.colorcat.jspider.internal.Utils;
 import okhttp3.*;
 
@@ -33,11 +36,12 @@ public class OkConnection implements Connection {
     }
 
     private WebSnapshot doGet(URI uri) throws IOException {
-        Request.Builder builder = new Request.Builder()
+        Request request = new Request.Builder()
                 .url(uri.toString())
-                .get();
-        addHeader(builder, uri);
-        Response response = client.newCall(builder.build()).execute();
+                .header(UserAgent.NAME, UserAgent.Value.CHROME_MAC)
+                .get()
+                .build();
+        Response response = client.newCall(request).execute();
         if (response.code() == 200) {
             ResponseBody body = response.body();
             if (body != null) {
@@ -53,20 +57,20 @@ public class OkConnection implements Connection {
         return WebSnapshot.newFailed(uri);
     }
 
-    private static void addHeader(Request.Builder builder, URI uri) {
-        Map<String, List<String>> headers = BrowserVersion.CHROME.headers();
-        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
-            String key = entry.getKey();
-            for (String value : entry.getValue()) {
-                builder.addHeader(key, value);
-            }
-        }
-        builder.addHeader("Host", uri.getHost());
-    }
-
     @SuppressWarnings("CloneDoesntCallSuperClone")
     @Override
     public Connection clone() {
         return new OkConnection(client);
+    }
+
+    private static Headers of(Map<String, List<String>> headers) {
+        Headers.Builder builder = new Headers.Builder();
+        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+            String key = entry.getKey();
+            for (String value : entry.getValue()) {
+                builder.add(key, value);
+            }
+        }
+        return builder.build();
     }
 }

@@ -1,4 +1,4 @@
-package download;
+package cc.colorcat.jspider.test.download;
 
 import cc.colorcat.jspider.internal.Log;
 import com.sun.istack.internal.Nullable;
@@ -11,23 +11,37 @@ import java.io.*;
  */
 public class FileUtils {
     public static final String USER_HOME;
-    public static final String DOWNLOAD;
 
     static {
         USER_HOME = System.getProperty("user.home");
-        File download = new File(USER_HOME, "Downloads");
-        if (!download.isDirectory()) {
-            download = new File(USER_HOME, "下载");
+    }
+
+    public static File createSavePath(File directory, String folderName, String fileName) {
+        File folder = directory;
+        if (folderName != null && !folderName.isEmpty()) {
+            folder = new File(folder, folderName);
         }
-        DOWNLOAD = download.isDirectory() ? download.getAbsolutePath() : USER_HOME;
+        if (folder.exists() || folder.mkdirs()) {
+            String baseName, extName;
+            int dot = fileName.lastIndexOf('.');
+            if (dot != -1) {
+                baseName = fileName.substring(0, dot);
+                extName = fileName.substring(dot);
+            } else {
+                baseName = fileName;
+                extName = "";
+            }
+            File savePath = new File(folder, baseName + extName);
+            for (int i = 0; savePath.exists(); i++) {
+                savePath = new File(folder, baseName + "_" + i + extName);
+            }
+            return savePath;
+        }
+        throw new RuntimeException("create directory failed, path = " + folder.toString());
     }
 
     public static File createDirWithinHome(String... children) {
         return createDir(USER_HOME, children);
-    }
-
-    public static File createDirWithinDownload(String... children) {
-        return createDir(DOWNLOAD, children);
     }
 
     public static File createDir(String directory, String... children) {

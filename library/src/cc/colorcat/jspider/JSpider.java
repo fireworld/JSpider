@@ -23,7 +23,7 @@ public class JSpider implements Call.Factory {
     private final ExecutorService executor;
     private final Dispatcher dispatcher;
     private final boolean depthFirst;
-    private final int maxTry;
+    private final int maxRetry;
     private final int maxSeedOnRunning;
     private final int maxDepth;
     private final EventListener listener;
@@ -38,7 +38,7 @@ public class JSpider implements Call.Factory {
         this.executor = builder.executor;
         this.dispatcher = builder.dispatcher != null ? builder.dispatcher : new Dispatcher(this, executor);
         this.depthFirst = builder.depthFirst;
-        this.maxTry = builder.maxTry;
+        this.maxRetry = builder.maxRetry;
         this.maxSeedOnRunning = builder.maxSeedOnRunning;
         this.maxDepth = builder.maxDepth;
         this.listener = builder.listener;
@@ -73,8 +73,8 @@ public class JSpider implements Call.Factory {
         return depthFirst;
     }
 
-    int maxTry() {
-        return maxTry;
+    int maxRetry() {
+        return maxRetry;
     }
 
     int maxSeedOnRunning() {
@@ -150,7 +150,7 @@ public class JSpider implements Call.Factory {
         private ExecutorService executor;
         private Dispatcher dispatcher;
         private boolean depthFirst = false;
-        private int maxTry = 3;
+        private int maxRetry = 3;
         private int maxSeedOnRunning = 20;
         private int maxDepth = 100;
         private EventListener listener;
@@ -171,7 +171,7 @@ public class JSpider implements Call.Factory {
             this.connection = spider.connection;
             this.executor = spider.executor;
             this.dispatcher = spider.dispatcher;
-            this.maxTry = spider.maxTry;
+            this.maxRetry = spider.maxRetry;
             this.maxSeedOnRunning = spider.maxSeedOnRunning;
             this.maxDepth = spider.maxDepth;
             this.listener = spider.listener;
@@ -233,11 +233,11 @@ public class JSpider implements Call.Factory {
             return this;
         }
 
-        public Builder maxTry(int maxRetry) {
+        public Builder maxRetry(int maxRetry) {
             if (maxRetry < 1) {
-                throw new IllegalArgumentException("maxTry < 1");
+                throw new IllegalArgumentException("maxRetry < 1");
             }
-            this.maxTry = maxRetry;
+            this.maxRetry = maxRetry;
             return this;
         }
 

@@ -1,5 +1,7 @@
+package cc.colorcat.jspider.test;
+
 import cc.colorcat.jspider.JSpider;
-import download.DownloadManager;
+import cc.colorcat.jspider.test.download.DownloadManager;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
@@ -7,12 +9,11 @@ import okhttp3.OkHttpClient;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Created by cxx on 17-11-9.
@@ -66,9 +67,10 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
 //        Scanner scanner = new Scanner(System.in);
-//        System.out.print("Input url: ");
-//        String url = scanner.next();
-//        testJSpider(url.trim());
+//        System.out.print("Input uri: ");
+//        String uri = scanner.next();
+//        testJSpider(uri.trim());
+        System.out.println(System.getProperties());
     }
 
     private static void testJSpider(String url) {

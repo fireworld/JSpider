@@ -6,9 +6,9 @@ package cc.colorcat.jspider;
  */
 public interface Call extends Runnable {
 
-    int count();
+    int retryCount();
 
-    void incrementCount();
+    void incrementRetryCount();
 
     Seed seed();
 

@@ -1,10 +1,12 @@
+package cc.colorcat.jspider.test;
+
 import cc.colorcat.jspider.EventListener;
 import cc.colorcat.jspider.Scrap;
 import cc.colorcat.jspider.Seed;
 import cc.colorcat.jspider.internal.Log;
 
 /**
- * Created by cxx on ${DATA}.
+ * Created by cxx on 2017/11/14.
  * xx.ch@outlook.com
  */
 public class TestEventListener implements EventListener {
@@ -15,7 +17,7 @@ public class TestEventListener implements EventListener {
 
     @Override
     public void onFailure(Seed seed, Exception reason) {
-        Log.s("spider failure, seed = " + seed.toString() + " \n\treason = " + reason.getMessage());
+        Log.s("spider failed, seed = " + seed.toString() + " \n\treason = " + reason.getMessage());
     }
 
     @Override

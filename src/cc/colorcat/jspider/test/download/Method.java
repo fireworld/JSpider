@@ -1,4 +1,4 @@
-package download;
+package cc.colorcat.jspider.test.download;
 
 /**
  * Created by cxx on 17-11-15.

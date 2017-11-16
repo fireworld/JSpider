@@ -1,18 +1,17 @@
+package cc.colorcat.jspider.test;
+
 import cc.colorcat.jspider.Handler;
 import cc.colorcat.jspider.Scrap;
-import cc.colorcat.jspider.internal.Utils;
-import download.DownloadManager;
-import download.Method;
-import download.Request;
+import cc.colorcat.jspider.internal.UserAgent;
+import cc.colorcat.jspider.test.download.DownloadManager;
+import cc.colorcat.jspider.test.download.FileUtils;
+import cc.colorcat.jspider.test.download.Task;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
- * Created by cxx on ${DATA}.
+ * Created by cxx on 2017/11/11.
  * xx.ch@outlook.com
  */
 class ImageHandler implements Handler {
@@ -27,13 +26,15 @@ class ImageHandler implements Handler {
     @Override
     public boolean handle(Scrap scrap) {
         Map<String, String> data = scrap.data();
-        String url = data.get("url");
+        String url = data.get("uri");
         if (url != null && url.matches("^(http)(s)?://(.)*\\.(jpg|png|jpeg)$")) {
             String folderName = data.get("dir");
             String fileName = url.substring(url.lastIndexOf('/') + 1, url.length());
-            Map<String, List<String>> headers = new HashMap<>();
-            headers.put("Referer", Collections.singletonList(scrap.uri().toString()));
-            manager.enqueue(Request.create(url, Method.GET, headers, Utils.createSavePath(directory, folderName, fileName)));
+            File savePath = FileUtils.createSavePath(directory, folderName, fileName);
+            manager.enqueue(Task.create(url, savePath)
+                    .header("Referer", scrap.uri().toString())
+                    .header(UserAgent.NAME, UserAgent.Value.CHROME_MAC)
+            );
             return true;
         }
         return false;

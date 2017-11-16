@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by cxx on ${DATA}.
+ * Created by cxx on 2017/11/11.
  * xx.ch@outlook.com
  */
 final class ParserProxy implements Parser {
