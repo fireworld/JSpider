@@ -3,7 +3,7 @@ package cc.colorcat.jspider.internal;
 import java.util.logging.*;
 
 /**
- * Created by cxx on 17-11-9.
+ * Created by cxx on 2017-11-9.
  * xx.ch@outlook.com
  */
 public class Log {

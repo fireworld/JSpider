@@ -3,7 +3,7 @@ package cc.colorcat.jspider;
 import java.util.List;
 
 /**
- * Created by cxx on 17-11-9.
+ * Created by cxx on 2017-11-9.
  * xx.ch@outlook.com
  */
 public interface Parser {

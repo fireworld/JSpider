@@ -4,7 +4,7 @@ import java.net.URI;
 import java.util.Map;
 
 /**
- * Created by cxx on 17-11-9.
+ * Created by cxx on 2017-11-9.
  * xx.ch@outlook.com
  */
 public final class Scrap extends Seed {

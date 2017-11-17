@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Created by cxx on 17-11-15.
+ * Created by cxx on 2017-11-15.
  * xx.ch@outlook.com
  */
 public class DownloadManager {

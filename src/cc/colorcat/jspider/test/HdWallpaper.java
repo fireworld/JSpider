@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by cxx on 17-11-16.
+ * Created by cxx on 2017-11-16.
  * xx.ch@outlook.com
  */
 public class HdWallpaper {

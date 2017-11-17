@@ -1,7 +1,7 @@
 package cc.colorcat.jspider.test.download;
 
 /**
- * Created by cxx on 17-11-15.
+ * Created by cxx on 2017-11-15.
  * xx.ch@outlook.com
  */
 public enum Method {
