@@ -57,7 +57,7 @@ final class Dispatcher {
 
     /**
      * @param call   the executed task
-     * @param reason the specified {@link Call} executed success if reason is null, else failed.
+     * @param reason the specified {@link Call} executed successful if reason is null, else failed.
      */
     synchronized void finished(final Call call, final Exception reason) {
         Seed seed = call.seed();
