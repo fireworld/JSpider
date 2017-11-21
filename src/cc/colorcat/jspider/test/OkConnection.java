@@ -17,11 +17,17 @@ import java.util.Map;
  * xx.ch@outlook.com
  */
 public class OkConnection implements Connection {
-    private OkHttpClient client;
+    private final OkHttpClient client;
+    private final Charset defaultCharset;
     private WebSnapshot snapshot;
 
     OkConnection(OkHttpClient client) {
+        this(client, Utils.UTF8);
+    }
+
+    public OkConnection(OkHttpClient client, Charset defaultCharset) {
         this.client = client;
+        this.defaultCharset = defaultCharset;
     }
 
     @Override
@@ -32,10 +38,10 @@ public class OkConnection implements Connection {
         if (snapshot != null && snapshot.isSuccess() && snapshot.uri().equals(uri)) {
             return snapshot;
         }
-        return this.snapshot = doGet(uri);
+        return this.snapshot = doGet(uri, defaultCharset);
     }
 
-    private WebSnapshot doGet(URI uri) throws IOException {
+    private WebSnapshot doGet(URI uri, Charset defaultCharset) throws IOException {
         Request request = new Request.Builder()
                 .url(uri.toString())
                 .header(UserAgent.NAME, UserAgent.Value.CHROME_MAC)
@@ -47,8 +53,8 @@ public class OkConnection implements Connection {
             if (body != null) {
                 try {
                     MediaType mediaType = body.contentType();
-                    Charset charset = mediaType != null ? mediaType.charset(Utils.UTF8) : Utils.UTF8;
-                    return WebSnapshot.newSuccess(uri, body.string(), charset);
+                    Charset charset = mediaType != null ? mediaType.charset(defaultCharset) : defaultCharset;
+                    return WebSnapshot.newSuccess(uri, new String(body.bytes(), charset), charset);
                 } finally {
                     Utils.close(body);
                 }

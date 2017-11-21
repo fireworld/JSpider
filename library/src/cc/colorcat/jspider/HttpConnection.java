@@ -14,11 +14,16 @@ import java.nio.charset.Charset;
  * Created by cxx on 2017/11/11.
  * xx.ch@outlook.com
  */
-final class HttpConnection implements Connection {
+public final class HttpConnection implements Connection {
     private WebSnapshot snapshot;
+    private final Charset defaultCharset;
 
-    HttpConnection() {
+    public HttpConnection() {
+        this(Utils.UTF8);
+    }
 
+    public HttpConnection(Charset defaultCharset) {
+        this.defaultCharset = Charset.defaultCharset();
     }
 
     @Override
@@ -29,10 +34,10 @@ final class HttpConnection implements Connection {
         if (snapshot != null && snapshot.isSuccess() && snapshot.uri().equals(uri)) {
             return snapshot;
         }
-        return this.snapshot = onGet(uri);
+        return this.snapshot = onGet(uri, defaultCharset);
     }
 
-    private static WebSnapshot onGet(URI uri) throws IOException {
+    private static WebSnapshot onGet(URI uri, Charset defaultCharset) throws IOException {
         HttpURLConnection conn = null;
         InputStream is = null;
         try {
@@ -42,7 +47,7 @@ final class HttpConnection implements Connection {
             conn.setReadTimeout(10000);
             int code = conn.getResponseCode();
             if (code == HttpURLConnection.HTTP_OK) {
-                Charset charset = Utils.parseCharset(conn.getContentType(), Utils.UTF8);
+                Charset charset = Utils.parseCharset(conn.getContentType(), defaultCharset);
                 is = conn.getInputStream();
                 if (is != null) {
                     String result = Utils.justReadString(is, charset);
@@ -61,6 +66,6 @@ final class HttpConnection implements Connection {
 
     @Override
     public Connection clone() {
-        return new HttpConnection();
+        return new HttpConnection(defaultCharset);
     }
 }
