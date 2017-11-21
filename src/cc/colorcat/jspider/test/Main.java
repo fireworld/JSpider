@@ -25,7 +25,7 @@ public class Main {
     private static final DownloadManager MANAGER;
 
     static {
-        SAVE_DIR = new File("/Users/cxx/Pictures/Spider");
+        SAVE_DIR = new File("E:\\Spider");
 
         COOKIE_JAR = new CookieJar() {
             private Map<String, List<Cookie>> cookies = new ConcurrentHashMap<>();
@@ -61,7 +61,7 @@ public class Main {
                 .eventListener(new TestEventListener())
                 .connection(new OkConnection(CLIENT))
                 .seedJar(new TestSeedJar())
-                .maxDepth(100)
+                .maxDepth(3)
                 .build();
     }
 

@@ -32,7 +32,7 @@ class BingPaper {
             if (filter(seed)) {
                 List<Scrap> scraps = new LinkedList<>();
                 Document doc = Jsoup.parse(snapshot.resource(), seed.baseUrl());
-                Elements elements = doc.select("a[class='ctrl cc.colorcat.jspider.test.download'][href~=^(/photo/)(.)*(force=cc.colorcat.jspider.test.download)$][target='_blank'][rel=nofollow]");
+                Elements elements = doc.select("a[class='ctrl download'][href~=^(/photo/)(.)*(force=download)$][target='_blank'][rel=nofollow]");
                 for (Element element : elements) {
                     String href = element.attr("href");
                     String url = seed.newUriWithJoin(href);
