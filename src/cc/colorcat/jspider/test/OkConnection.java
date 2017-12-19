@@ -66,7 +66,7 @@ public class OkConnection implements Connection {
     @SuppressWarnings("CloneDoesntCallSuperClone")
     @Override
     public Connection clone() {
-        return new OkConnection(client);
+        return new OkConnection(client, defaultCharset);
     }
 
     private static Headers of(Map<String, List<String>> headers) {
