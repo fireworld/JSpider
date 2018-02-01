@@ -164,7 +164,7 @@ public class JSpider implements Call.Factory {
             seedJar = SeedJar.NO_SEEDS;
         }
 
-        public Builder(JSpider spider) {
+        private Builder(JSpider spider) {
             this.handlers = new HashMap<>(spider.handlers);
             this.interceptors = new ArrayList<>(spider.interceptors);
             this.parsers = new ArrayList<>(spider.parsers);

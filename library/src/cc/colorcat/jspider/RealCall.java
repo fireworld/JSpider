@@ -42,7 +42,7 @@ final class RealCall implements Call {
     public void execute() {
         Exception reason = null;
         try {
-            List<? extends Seed> newSeeds = getScrapsWitInterceptorChain();
+            List<? extends Seed> newSeeds = getScrapsWithInterceptorChain();
             if (!newSeeds.isEmpty()) {
                 spider.mapAndEnqueue(newSeeds);
             }
@@ -58,7 +58,7 @@ final class RealCall implements Call {
         execute();
     }
 
-    private List<Scrap> getScrapsWitInterceptorChain() throws IOException {
+    private List<Scrap> getScrapsWithInterceptorChain() throws IOException {
         List<Interceptor> users = spider.interceptors();
         List<Interceptor> interceptors = new ArrayList<>(users.size() + 3);
         interceptors.add(new SeedsCleanerInterceptor(spider));
