@@ -66,6 +66,7 @@ final class Dispatcher {
         if (reason == null) {
             finished.add(call); // successful
             promoteCalls();
+            spider.listener().onSuccess(seed);
         } else {
             call.incrementRetryCount();
             if (call.retryCount() <= spider.maxRetry()) {
@@ -73,13 +74,14 @@ final class Dispatcher {
             } else {
                 finished.add(call); // failed
                 promoteCalls();
+                spider.listener().onFailure(seed, reason);
             }
         }
-        if (reason == null) {
-            spider.listener().onSuccess(seed);
-        } else {
-            spider.listener().onFailure(seed, reason);
-        }
+//        if (reason == null) {
+//            spider.listener().onSuccess(seed);
+//        } else {
+//            spider.listener().onFailure(seed, reason);
+//        }
     }
 
     void handled(final Scrap scrap) {

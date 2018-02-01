@@ -23,7 +23,7 @@ public final class HttpConnection implements Connection {
     }
 
     public HttpConnection(Charset defaultCharset) {
-        this.defaultCharset = Charset.defaultCharset();
+        this.defaultCharset = defaultCharset;
     }
 
     @Override
