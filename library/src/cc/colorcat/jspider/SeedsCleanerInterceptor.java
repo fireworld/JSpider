@@ -21,7 +21,7 @@ final class SeedsCleanerInterceptor implements Interceptor {
         Iterator<Scrap> iterator = scraps.iterator();
         while (iterator.hasNext()) {
             Scrap scrap = iterator.next();
-            if (scrap.depth() > spider.maxDepth()) {
+            if (scrap.depth() >= spider.maxDepth()) {
                 iterator.remove();
                 spider.dispatcher().onReachedMaxDepth(scrap);
             }
